@@ -1,0 +1,96 @@
+@theme {
+    --font-body-sm: var(--font-family);
+    --font-body-md: var(--font-family);
+    --font-body-lg: var(--font-family);
+    --font-label-sm: var(--font-family);
+    --font-label-md: var(--font-family);
+    --font-headline-md: var(--font-family);
+    --font-headline-lg: var(--font-family);
+    --font-headline-lg-mobile: var(--font-family);
+    --font-display: var(--font-family);
+
+    --text-body-sm: var(--body--sm);
+    --text-body-md: var(--body--md);
+    --text-body-lg: var(--body--lg);
+    --text-label-sm: 11px;
+    --text-label-md: var(--label--md);
+    --text-headline-md: var(--headings--h4);
+    --text-headline-lg: var(--headings--h3);
+    --text-headline-lg-mobile: 26px;
+    --text-display: 44px;
+}
+
+@layer components {
+    /* Typography Classes */
+    .heading-1 {
+        font-family: var(--font-family);
+        font-size: var(--headings--h1);
+        font-style: normal;
+        font-weight: var(--font-weight--600);
+        line-height: 100%;
+        letter-spacing: -0.02em;
+        color: var(--text-primary);
+    }
+
+    .heading-2 {
+        font-family: var(--font-family);
+        font-size: var(--headings--h2);
+        font-style: normal;
+        font-weight: var(--font-weight--600);
+        line-height: normal;
+        letter-spacing: -0.02em;
+        color: var(--text-primary);
+    }
+
+    .heading-3 {
+        font-family: var(--font-family);
+        font-size: var(--headings--h3);
+        font-style: normal;
+        font-weight: var(--font-weight--700);
+        line-height: 110%;
+        color: var(--text-primary);
+    }
+
+    .heading-4 {
+        font-family: var(--font-family);
+        font-size: var(--headings--h4);
+        font-style: normal;
+        font-weight: var(--font-weight--600);
+        line-height: 120%;
+        color: var(--text-primary);
+    }
+
+    .body-large {
+        font-family: var(--font-family);
+        font-size: var(--body--lg);
+        font-weight: var(--font-weight--400);
+        line-height: 150%;
+        color: var(--text-primary);
+    }
+
+    .body-medium {
+        font-family: var(--font-family);
+        font-size: var(--body--md);
+        font-weight: var(--font-weight--400);
+        line-height: 150%;
+        color: var(--text-primary);
+    }
+
+    .body-small {
+        font-family: var(--font-family);
+        font-size: var(--body--sm);
+        font-weight: var(--font-weight--400);
+        line-height: 140%;
+        color: var(--text-primary);
+    }
+
+    .label-medium {
+        font-family: var(--font-family);
+        font-size: var(--label--md);
+        font-weight: var(--font-weight--600);
+        line-height: normal;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--text-primary);
+    }
+}

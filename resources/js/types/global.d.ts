@@ -1,3 +1,4 @@
+import type { RouteParam, RouteParamsWithQueryOverload } from 'ziggy-js';
 import type { Auth } from '@/types/auth';
 
 declare module 'react' {
@@ -16,4 +17,13 @@ declare module '@inertiajs/core' {
             [key: string]: unknown;
         };
     }
+}
+
+declare global {
+    function route(): string;
+    function route(
+        name: string,
+        params?: RouteParamsWithQueryOverload | RouteParam,
+        absolute?: boolean,
+    ): string;
 }

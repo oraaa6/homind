@@ -1,102 +1,94 @@
-import { Form, Head } from '@inertiajs/react';
-import InputError from '@/components/input-error';
-import PasswordInput from '@/components/password-input';
-import TextLink from '@/components/text-link';
-import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Spinner } from '@/components/ui/spinner';
-import { register } from '@/routes';
-import { store } from '@/routes/login';
-import { request } from '@/routes/password';
+import { LockOutlined, MailOutlined } from '@ant-design/icons';
+import { Head, Link, useForm } from '@inertiajs/react';
+import { Checkbox, Flex, Form, Input } from 'antd';
+import type { ReactNode } from 'react';
+import AuthLayout from '@/layouts/auth/AuthLayout';
 
 type Props = {
     status?: string;
     canResetPassword: boolean;
 };
 
+type LoginForm = {
+    email: string;
+    password: string;
+    remember?: boolean;
+    [key: string]: string | boolean | undefined;
+};
+
 export default function Login({ status, canResetPassword }: Props) {
+    const { data, setData, post, processing, errors, reset } =
+        useForm<LoginForm>({
+            email: '',
+            password: '',
+            remember: false,
+        });
+
+    const handleSubmit = () => {
+        post(route('login'), {
+            onFinish: () => reset('password'),
+            onError: () => reset('password'),
+        });
+    };
+
     return (
         <>
             <Head title="Log in" />
 
-            <Form
-                {...store.form()}
-                resetOnSuccess={['password']}
-                className="flex flex-col gap-6"
-            >
-                {({ processing, errors }) => (
-                    <>
-                        <div className="grid gap-6">
-                            <div className="grid gap-2">
-                                <Label htmlFor="email">Email address</Label>
-                                <Input
-                                    id="email"
-                                    type="email"
-                                    name="email"
-                                    required
-                                    autoFocus
-                                    tabIndex={1}
-                                    autoComplete="email"
-                                    placeholder="email@example.com"
-                                />
-                                <InputError message={errors.email} />
-                            </div>
+            <Form onFinish={handleSubmit} layout="vertical">
+                <Form.Item
+                    label="Adres e-mail"
+                    validateStatus={errors.email ? 'error' : ''}
+                >
+                    <Input
+                        prefix={
+                            <MailOutlined className="mr-1 text-gray-400!" />
+                        }
+                        placeholder="email@example.com"
+                        value={data.email}
+                        onChange={(e) => setData('email', e.target.value)}
+                        name="email"
+                        type="email"
+                        autoFocus
+                        size="large"
+                    />
+                </Form.Item>
 
-                            <div className="grid gap-2">
-                                <div className="flex items-center">
-                                    <Label htmlFor="password">Password</Label>
-                                    {canResetPassword && (
-                                        <TextLink
-                                            href={request()}
-                                            className="ml-auto text-sm"
-                                            tabIndex={5}
-                                        >
-                                            Forgot your password?
-                                        </TextLink>
-                                    )}
-                                </div>
-                                <PasswordInput
-                                    id="password"
-                                    name="password"
-                                    required
-                                    tabIndex={2}
-                                    autoComplete="current-password"
-                                    placeholder="Password"
-                                />
-                                <InputError message={errors.password} />
-                            </div>
+                <Form.Item
+                    label="Hasło"
+                    validateStatus={errors.password ? 'error' : ''}
+                >
+                    <Input.Password
+                        prefix={
+                            <LockOutlined className="mr-1 text-gray-400!" />
+                        }
+                        placeholder="Hasło"
+                        value={data.password}
+                        onChange={(e) => setData('password', e.target.value)}
+                        name="password"
+                        autoComplete="current-password"
+                        size="large"
+                    />
+                </Form.Item>
 
-                            <div className="flex items-center space-x-3">
-                                <Checkbox
-                                    id="remember"
-                                    name="remember"
-                                    tabIndex={3}
-                                />
-                                <Label htmlFor="remember">Remember me</Label>
-                            </div>
+                <Form.Item className="!mb-6">
+                    <Flex justify="space-between" align="center">
+                        <Checkbox
+                            checked={data.remember as boolean}
+                            onChange={(e) =>
+                                setData('remember', e.target.checked)
+                            }
+                        >
+                            Zapamiętaj mnie
+                        </Checkbox>
 
-                            <Button
-                                type="submit"
-                                className="mt-4 w-full"
-                                tabIndex={4}
-                                disabled={processing}
-                                data-test="login-button"
-                            >
-                                {processing && <Spinner />}
-                                Log in
-                            </Button>
-                        </div>
-
-                        <div className="text-center text-sm text-muted-foreground">
-                            Don't have an account?{' '}
-                            <TextLink href={register()} tabIndex={5}>
-                                Sign up
-                            </TextLink>
-                        </div>
-                    </>
-                )}
+                        {canResetPassword && (
+                            <Link href={route('password.request')}>
+                                Nie pamiętasz hasła?
+                            </Link>
+                        )}
+                    </Flex>
+                </Form.Item>
             </Form>
 
             {status && (
@@ -108,7 +100,4 @@ export default function Login({ status, canResetPassword }: Props) {
     );
 }
 
-Login.layout = {
-    title: 'Log in to your account',
-    description: 'Enter your email and password below to log in',
-};
+Login.layout = (page: ReactNode) => <AuthLayout children={page} />;

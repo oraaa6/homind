@@ -1,120 +1,136 @@
-import { Form, Head } from '@inertiajs/react';
-import InputError from '@/components/input-error';
-import PasswordInput from '@/components/password-input';
-import TextLink from '@/components/text-link';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Spinner } from '@/components/ui/spinner';
-import { login } from '@/routes';
-import { store } from '@/routes/register';
+import { Button } from '@/components/Button';
+import AuthLayout from '@/layouts/auth/AuthLayout';
+import { LockOutlined, MailOutlined, UserOutlined } from '@ant-design/icons';
+import { Head, Link, useForm } from '@inertiajs/react';
+import { Form, Input, message, Spin } from 'antd';
+import type { ReactNode } from 'react';
 
 type Props = {
     passwordRules: string;
 };
 
 export default function Register({ passwordRules }: Props) {
+    const { data, setData, post, processing, errors } = useForm({
+        name: '',
+        email: '',
+        password: '',
+        password_confirmation: '',
+    });
+
+    const handleSubmit = () => {
+        post(route('register.store'), {
+            onSuccess: () => {
+                message.success('Udalo się załozyc konto!');
+            },
+        });
+    };
+
     return (
         <>
             <Head title="Register" />
-            <Form
-                {...store.form()}
-                resetOnSuccess={['password', 'password_confirmation']}
-                disableWhileProcessing
-                className="flex flex-col gap-6"
-            >
-                {({ processing, errors }) => (
-                    <>
-                        <div className="grid gap-6">
-                            <div className="grid gap-2">
-                                <Label htmlFor="name">Name</Label>
-                                <Input
-                                    id="name"
-                                    type="text"
-                                    required
-                                    autoFocus
-                                    tabIndex={1}
-                                    autoComplete="name"
-                                    name="name"
-                                    placeholder="Full name"
-                                />
-                                <InputError
-                                    message={errors.name}
-                                    className="mt-2"
-                                />
-                            </div>
+            <div>
+                <div className="mb-12">
+                    <h1 className="heading-3 mb-3">Witamy!</h1>
+                    <p className="body-medium">
+                        Zarejestruj się i ogranij dom już dziś!
+                    </p>
+                </div>
 
-                            <div className="grid gap-2">
-                                <Label htmlFor="email">Email address</Label>
-                                <Input
-                                    id="email"
-                                    type="email"
-                                    required
-                                    tabIndex={2}
-                                    autoComplete="email"
-                                    name="email"
-                                    placeholder="email@example.com"
-                                />
-                                <InputError message={errors.email} />
-                            </div>
+                <Form onFinish={handleSubmit} layout="vertical">
+                    <div>
+                        <Form.Item
+                            label="Imię i nazwisko"
+                            validateStatus={errors.name ? 'error' : ''}
+                        >
+                            <Input
+                                prefix={<UserOutlined className="mr-1" />}
+                                placeholder="Jan Kowalski"
+                                value={data.name}
+                                onChange={(e) =>
+                                    setData('name', e.target.value)
+                                }
+                                name="name"
+                                autoFocus
+                                size="large"
+                            />
+                        </Form.Item>
 
-                            <div className="grid gap-2">
-                                <Label htmlFor="password">Password</Label>
-                                <PasswordInput
-                                    id="password"
-                                    required
-                                    tabIndex={3}
-                                    autoComplete="new-password"
-                                    name="password"
-                                    placeholder="Password"
-                                    passwordrules={passwordRules}
-                                />
-                                <InputError message={errors.password} />
-                            </div>
+                        <Form.Item
+                            label="Adres e-mail"
+                            validateStatus={errors.email ? 'error' : ''}
+                        >
+                            <Input
+                                prefix={<MailOutlined className="mr-1" />}
+                                placeholder="email@example.com"
+                                value={data.email}
+                                onChange={(e) =>
+                                    setData('email', e.target.value)
+                                }
+                                name="email"
+                                type="email"
+                                autoFocus
+                                size="large"
+                            />
+                        </Form.Item>
 
-                            <div className="grid gap-2">
-                                <Label htmlFor="password_confirmation">
-                                    Confirm password
-                                </Label>
-                                <PasswordInput
-                                    id="password_confirmation"
-                                    required
-                                    tabIndex={4}
-                                    autoComplete="new-password"
-                                    name="password_confirmation"
-                                    placeholder="Confirm password"
-                                    passwordrules={passwordRules}
-                                />
-                                <InputError
-                                    message={errors.password_confirmation}
-                                />
-                            </div>
+                        <Form.Item
+                            label="Hasło"
+                            validateStatus={errors.password ? 'error' : ''}
+                        >
+                            <Input.Password
+                                prefix={<LockOutlined className="mr-1" />}
+                                placeholder="Hasło"
+                                value={data.password}
+                                onChange={(e) =>
+                                    setData('password', e.target.value)
+                                }
+                                name="password"
+                                size="large"
+                            />
+                        </Form.Item>
 
-                            <Button
-                                type="submit"
-                                className="mt-2 w-full"
-                                tabIndex={5}
-                                data-test="register-user-button"
-                            >
-                                {processing && <Spinner />}
-                                Create account
-                            </Button>
-                        </div>
+                        <Form.Item
+                            label="Potwierdzenie hasła"
+                            validateStatus={
+                                errors.password_confirmation ? 'error' : ''
+                            }
+                        >
+                            <Input.Password
+                                prefix={<LockOutlined className="mr-1" />}
+                                placeholder="Potwierdzenie hasła"
+                                value={data.password_confirmation}
+                                onChange={(e) =>
+                                    setData(
+                                        'password_confirmation',
+                                        e.target.value,
+                                    )
+                                }
+                                name="password_confirmation"
+                                size="large"
+                            />
+                        </Form.Item>
 
-                        <div className="text-center text-sm text-muted-foreground">
-                            Already have an account?{' '}
-                            <TextLink href={login()} tabIndex={6}>
-                                Log in
-                            </TextLink>
-                        </div>
-                    </>
-                )}
-            </Form>
+                        <Button
+                            className="mt-2 w-full"
+                            htmlType="submit"
+                            data-test="register-user-button"
+                            type="primary"
+                        >
+                            {processing && <Spin />}
+                            Create account
+                        </Button>
+                    </div>
+
+                    <div className="text-center text-sm text-muted-foreground">
+                        Already have an account?{' '}
+                        <Link href={route('login')} tabIndex={6}>
+                            Log in
+                        </Link>
+                    </div>
+                </Form>
+            </div>
         </>
     );
 }
 
-Register.layout = {
-    title: 'Create an account',
-    description: 'Enter your details below to create your account',
-};
+Register.layout = (page: ReactNode) => <AuthLayout children={page} />;
