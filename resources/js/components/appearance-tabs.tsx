@@ -1,5 +1,5 @@
-import type { LucideIcon } from 'lucide-react';
-import { Monitor, Moon, Sun } from 'lucide-react';
+import { SunOutlined } from '@ant-design/icons';
+import type { ComponentType } from 'react';
 import type { HTMLAttributes } from 'react';
 import type { Appearance } from '@/hooks/use-appearance';
 import { useAppearance } from '@/hooks/use-appearance';
@@ -11,11 +11,11 @@ export default function AppearanceToggleTab({
 }: HTMLAttributes<HTMLDivElement>) {
     const { appearance, updateAppearance } = useAppearance();
 
-    const tabs: { value: Appearance; icon: LucideIcon; label: string }[] = [
-        { value: 'light', icon: Sun, label: 'Light' },
-        { value: 'dark', icon: Moon, label: 'Dark' },
-        { value: 'system', icon: Monitor, label: 'System' },
-    ];
+    const tabs: {
+        value: Appearance;
+        icon: ComponentType<{ className?: string }>;
+        label: string;
+    }[] = [{ value: 'light', icon: SunOutlined, label: 'Light' }];
 
     return (
         <div

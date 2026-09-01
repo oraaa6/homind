@@ -1,15 +1,13 @@
-import { Button } from '@/components/Button';
-import AuthLayout from '@/layouts/auth/AuthLayout';
 import { LockOutlined, MailOutlined, UserOutlined } from '@ant-design/icons';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { Form, Input, message, Spin } from 'antd';
 import type { ReactNode } from 'react';
+import Button from '@/components/Button';
+import AuthLayout from '@/layouts/auth/auth-layout';
+import { login } from '@/routes';
+import { store as registerStore } from '@/routes/register';
 
-type Props = {
-    passwordRules: string;
-};
-
-export default function Register({ passwordRules }: Props) {
+export default function Register() {
     const { data, setData, post, processing, errors } = useForm({
         name: '',
         email: '',
@@ -18,9 +16,9 @@ export default function Register({ passwordRules }: Props) {
     });
 
     const handleSubmit = () => {
-        post(route('register.store'), {
+        post(registerStore.url(), {
             onSuccess: () => {
-                message.success('Udalo się załozyc konto!');
+                message.success('Udało się załozyc konto!');
             },
         });
     };
@@ -41,6 +39,7 @@ export default function Register({ passwordRules }: Props) {
                         <Form.Item
                             label="Imię i nazwisko"
                             validateStatus={errors.name ? 'error' : ''}
+                            help={errors.name}
                         >
                             <Input
                                 prefix={<UserOutlined className="mr-1" />}
@@ -58,6 +57,7 @@ export default function Register({ passwordRules }: Props) {
                         <Form.Item
                             label="Adres e-mail"
                             validateStatus={errors.email ? 'error' : ''}
+                            help={errors.email}
                         >
                             <Input
                                 prefix={<MailOutlined className="mr-1" />}
@@ -76,6 +76,7 @@ export default function Register({ passwordRules }: Props) {
                         <Form.Item
                             label="Hasło"
                             validateStatus={errors.password ? 'error' : ''}
+                            help={errors.password}
                         >
                             <Input.Password
                                 prefix={<LockOutlined className="mr-1" />}
@@ -91,6 +92,7 @@ export default function Register({ passwordRules }: Props) {
 
                         <Form.Item
                             label="Potwierdzenie hasła"
+                            help={errors.password_confirmation}
                             validateStatus={
                                 errors.password_confirmation ? 'error' : ''
                             }
@@ -111,20 +113,24 @@ export default function Register({ passwordRules }: Props) {
                         </Form.Item>
 
                         <Button
-                            className="mt-2 w-full"
+                            className="mt-12 w-full"
                             htmlType="submit"
                             data-test="register-user-button"
                             type="primary"
                         >
                             {processing && <Spin />}
-                            Create account
+                            Utwórz konto
                         </Button>
                     </div>
 
-                    <div className="text-center text-sm text-muted-foreground">
-                        Already have an account?{' '}
-                        <Link href={route('login')} tabIndex={6}>
-                            Log in
+                    <div className="mt-2 text-center text-sm text-muted-foreground">
+                        Masz już konto?{' '}
+                        <Link
+                            href={login()}
+                            className="text-primary"
+                            tabIndex={6}
+                        >
+                            Zaloguj się
                         </Link>
                     </div>
                 </Form>

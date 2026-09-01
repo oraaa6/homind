@@ -1,11 +1,9 @@
 // Components
+import { LoadingOutlined } from '@ant-design/icons';
 import { Form, Head } from '@inertiajs/react';
-import { LoaderCircle } from 'lucide-react';
+import { Button, Input, Typography } from 'antd';
 import InputError from '@/components/input-error';
 import TextLink from '@/components/text-link';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { login } from '@/routes';
 import { email } from '@/routes/password';
 
@@ -25,7 +23,7 @@ export default function ForgotPassword({ status }: { status?: string }) {
                     {({ processing, errors }) => (
                         <>
                             <div className="grid gap-2">
-                                <Label htmlFor="email">Email address</Label>
+                                <Typography.Text>Email address</Typography.Text>
                                 <Input
                                     id="email"
                                     type="email"
@@ -42,10 +40,12 @@ export default function ForgotPassword({ status }: { status?: string }) {
                                 <Button
                                     className="w-full"
                                     disabled={processing}
+                                    htmlType="submit"
+                                    type="primary"
                                     data-test="email-password-reset-link-button"
                                 >
                                     {processing && (
-                                        <LoaderCircle className="h-4 w-4 animate-spin" />
+                                        <LoadingOutlined className="h-4 w-4" />
                                     )}
                                     Email password reset link
                                 </Button>

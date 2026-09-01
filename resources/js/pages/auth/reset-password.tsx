@@ -1,10 +1,6 @@
 import { Form, Head } from '@inertiajs/react';
+import { Button, Input, Spin, Typography } from 'antd';
 import InputError from '@/components/input-error';
-import PasswordInput from '@/components/password-input';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Spinner } from '@/components/ui/spinner';
 import { update } from '@/routes/password';
 
 type Props = {
@@ -26,7 +22,7 @@ export default function ResetPassword({ token, email, passwordRules }: Props) {
                 {({ processing, errors }) => (
                     <div className="grid gap-6">
                         <div className="grid gap-2">
-                            <Label htmlFor="email">Email</Label>
+                            <Typography.Text>Email</Typography.Text>
                             <Input
                                 id="email"
                                 type="email"
@@ -43,8 +39,8 @@ export default function ResetPassword({ token, email, passwordRules }: Props) {
                         </div>
 
                         <div className="grid gap-2">
-                            <Label htmlFor="password">Password</Label>
-                            <PasswordInput
+                            <Typography.Text>Password</Typography.Text>
+                            <Input.Password
                                 id="password"
                                 name="password"
                                 autoComplete="new-password"
@@ -57,10 +53,8 @@ export default function ResetPassword({ token, email, passwordRules }: Props) {
                         </div>
 
                         <div className="grid gap-2">
-                            <Label htmlFor="password_confirmation">
-                                Confirm password
-                            </Label>
-                            <PasswordInput
+                            <Typography.Text>Confirm password</Typography.Text>
+                            <Input.Password
                                 id="password_confirmation"
                                 name="password_confirmation"
                                 autoComplete="new-password"
@@ -75,12 +69,13 @@ export default function ResetPassword({ token, email, passwordRules }: Props) {
                         </div>
 
                         <Button
-                            type="submit"
+                            htmlType="submit"
+                            type="primary"
                             className="mt-4 w-full"
                             disabled={processing}
                             data-test="reset-password-button"
                         >
-                            {processing && <Spinner />}
+                            {processing && <Spin size="small" />}
                             Reset password
                         </Button>
                     </div>

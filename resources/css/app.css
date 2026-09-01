@@ -6,7 +6,24 @@
 @source '../views';
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 
+/* tutaj se mozna nadpisywac klasy tailwindowe */
 @theme {
+    --color-background: var(--background);
+    --color-foreground: var(--text-primary);
+    --color-primary: var(--primary);
+    --color-primary-foreground: #ffffff;
+    --color-secondary: var(--secondary);
+    --color-secondary-foreground: #ffffff;
+    --color-surface-muted: var(--surface-muted);
+    --color-tertiary: var(--tertiary);
+    --color-neutral: var(--neutral);
+    --color-muted: var(--tertiary);
+    --color-muted-foreground: var(--neutral);
+    --color-border: #d2d5ce;
+    --breakpoint-3xl: 1980px;
+}
+
+/* @theme {
     --font-sans: var(--font-family);
 
     --color-background: var(--background);
@@ -98,7 +115,7 @@
     --spacing-container-max: var(--spacing-container-max-value);
     --spacing-gutter: var(--spacing-gutter-value);
     --spacing-margin-mobile: var(--spacing-margin-mobile-value);
-}
+} */
 
 :root {
     /* Colors */
@@ -109,6 +126,9 @@
     --tertiary: #f9f7f2;
     --neutral: #777775;
     --button-text: #434843;
+    --white: #fff;
+
+    --surface-muted: #f0ede4;
 
     /* Radius */
     --radius-default: 0.25rem;
@@ -145,10 +165,9 @@
     --font-weight--500: 500;
     --font-weight--600: 600;
     --font-weight--700: 700;
-
 }
 
 html,
 body {
-    background-color: var(--color-background);
+    background-color: var(--background);
 }

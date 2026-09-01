@@ -1,12 +1,10 @@
 import { Form, Head, usePage } from '@inertiajs/react';
 import { Link } from '@inertiajs/react';
+import { Button, Input, Typography } from 'antd';
 import ProfileController from '@/actions/App/Http/Controllers/Settings/ProfileController';
 import DeleteUser from '@/components/delete-user';
 import Heading from '@/components/heading';
 import InputError from '@/components/input-error';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { edit } from '@/routes/profile';
 import { send } from '@/routes/verification';
 import type { Auth } from '@/types';
@@ -47,7 +45,7 @@ export default function Profile({
                     {({ processing, errors }) => (
                         <>
                             <div className="grid gap-2">
-                                <Label htmlFor="name">Name</Label>
+                                <Typography.Text>Name</Typography.Text>
 
                                 <Input
                                     id="name"
@@ -66,7 +64,7 @@ export default function Profile({
                             </div>
 
                             <div className="grid gap-2">
-                                <Label htmlFor="email">Email address</Label>
+                                <Typography.Text>Email address</Typography.Text>
 
                                 <Input
                                     id="email"
@@ -113,6 +111,8 @@ export default function Profile({
                             <div className="flex items-center gap-4">
                                 <Button
                                     disabled={processing}
+                                    htmlType="submit"
+                                    type="primary"
                                     data-test="update-profile-button"
                                 >
                                     Save

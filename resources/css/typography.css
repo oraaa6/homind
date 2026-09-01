@@ -1,19 +1,41 @@
 @theme {
-    --font-body-sm: var(--font-family);
-    --font-body-md: var(--font-family);
-    --font-body-lg: var(--font-family);
-    --font-label-sm: var(--font-family);
-    --font-label-md: var(--font-family);
-    --font-headline-md: var(--font-family);
-    --font-headline-lg: var(--font-family);
-    --font-headline-lg-mobile: var(--font-family);
-    --font-display: var(--font-family);
+    --font-sans: var(--font-family);
+
+    --text-heading-1: var(--headings--h1);
+    --text-heading-1--font-weight: var(--font-weight--600);
+    --text-heading-1--line-height: 100%;
+    --text-heading-1--letter-spacing: -0.02em;
+
+    --text-heading-2: var(--headings--h2);
+    --text-heading-2--font-weight: var(--font-weight--600);
+    --text-heading-2--line-height: normal;
+    --text-heading-2--letter-spacing: -0.02em;
+
+    --text-heading-3: var(--headings--h3);
+    --text-heading-3--font-weight: var(--font-weight--700);
+    --text-heading-3--line-height: 110%;
+
+    --text-heading-4: var(--headings--h4);
+    --text-heading-4--font-weight: var(--font-weight--600);
+    --text-heading-4--line-height: 120%;
 
     --text-body-sm: var(--body--sm);
+    --text-body-sm--font-weight: var(--font-weight--400);
+    --text-body-sm--line-height: 140%;
+
     --text-body-md: var(--body--md);
+    --text-body-md--font-weight: var(--font-weight--400);
+    --text-body-md--line-height: 150%;
+
     --text-body-lg: var(--body--lg);
-    --text-label-sm: 11px;
+    --text-body-lg--font-weight: var(--font-weight--400);
+    --text-body-lg--line-height: 150%;
+
     --text-label-md: var(--label--md);
+    --text-label-md--font-weight: var(--font-weight--600);
+    --text-label-md--line-height: normal;
+    --text-label-md--letter-spacing: 0.05em;
+
     --text-headline-md: var(--headings--h4);
     --text-headline-lg: var(--headings--h3);
     --text-headline-lg-mobile: 26px;
@@ -21,76 +43,43 @@
 }
 
 @layer components {
-    /* Typography Classes */
     .heading-1 {
-        font-family: var(--font-family);
-        font-size: var(--headings--h1);
-        font-style: normal;
-        font-weight: var(--font-weight--600);
-        line-height: 100%;
-        letter-spacing: -0.02em;
+        @apply text-heading-1;
         color: var(--text-primary);
     }
 
     .heading-2 {
-        font-family: var(--font-family);
-        font-size: var(--headings--h2);
-        font-style: normal;
-        font-weight: var(--font-weight--600);
-        line-height: normal;
-        letter-spacing: -0.02em;
+        @apply text-heading-2;
         color: var(--text-primary);
     }
 
     .heading-3 {
-        font-family: var(--font-family);
-        font-size: var(--headings--h3);
-        font-style: normal;
-        font-weight: var(--font-weight--700);
-        line-height: 110%;
+        @apply text-heading-3;
         color: var(--text-primary);
     }
 
     .heading-4 {
-        font-family: var(--font-family);
-        font-size: var(--headings--h4);
-        font-style: normal;
-        font-weight: var(--font-weight--600);
-        line-height: 120%;
+        @apply text-heading-4;
         color: var(--text-primary);
     }
 
     .body-large {
-        font-family: var(--font-family);
-        font-size: var(--body--lg);
-        font-weight: var(--font-weight--400);
-        line-height: 150%;
+        @apply text-body-lg;
         color: var(--text-primary);
     }
 
     .body-medium {
-        font-family: var(--font-family);
-        font-size: var(--body--md);
-        font-weight: var(--font-weight--400);
-        line-height: 150%;
+        @apply text-body-md;
         color: var(--text-primary);
     }
 
     .body-small {
-        font-family: var(--font-family);
-        font-size: var(--body--sm);
-        font-weight: var(--font-weight--400);
-        line-height: 140%;
+        @apply text-body-sm;
         color: var(--text-primary);
     }
 
     .label-medium {
-        font-family: var(--font-family);
-        font-size: var(--label--md);
-        font-weight: var(--font-weight--600);
-        line-height: normal;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
+        @apply text-label-md uppercase;
         color: var(--text-primary);
     }
 }

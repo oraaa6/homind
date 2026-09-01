@@ -3,12 +3,14 @@ import type { ThemeConfig } from 'antd';
 export const antdTheme: ThemeConfig = {
     token: {
         colorPrimary: '#4a5d4e',
+        colorLink: '#4a5d4e',
+        colorLinkHover: '#4a5d4e',
+        colorLinkActive: '#4a5d4e',
         colorText: '#1b1c1a',
         colorTextSecondary: '#777775',
         colorBgBase: '#fbf9f6',
         colorBgContainer: '#f9f7f2',
         colorBorder: '#777775',
-        colorError: '#242728',
         colorFill: '#f9f7f2',
         colorFillSecondary: '#f9f7f2',
         colorFillTertiary: '#f9f7f2',
@@ -60,6 +62,25 @@ export const antdTheme: ThemeConfig = {
             colorBorder: '#777775',
             colorText: '#1b1c1a',
             colorTextPlaceholder: '#777775',
+        },
+        Layout: {
+            bodyBg: '#fbf9f6',
+            headerBg: '#fbf9f6',
+            siderBg: '#eeece4',
+            triggerHeight: 30,
+        },
+        Card: {
+            colorBgContainer: '#ffffff',
+            colorBorderSecondary: '#d2d5ce',
+        },
+        Menu: {
+            itemBg: 'transparent',
+            itemSelectedBg: '#eaf2ed',
+            itemSelectedColor: '#4a5d4e',
+            itemColor: '#444744',
+            itemHoverBg: '#f6f5ef',
+            itemHoverColor: '#4a5d4e',
+            groupTitleColor: '#444744',
         },
     },
 };

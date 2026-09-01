@@ -1,9 +1,6 @@
 import { Form, Head } from '@inertiajs/react';
+import { Button, Input, Spin, Typography } from 'antd';
 import InputError from '@/components/input-error';
-import PasswordInput from '@/components/password-input';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
-import { Spinner } from '@/components/ui/spinner';
 import { store } from '@/routes/password/confirm';
 
 export default function ConfirmPassword() {
@@ -15,8 +12,8 @@ export default function ConfirmPassword() {
                 {({ processing, errors }) => (
                     <div className="space-y-6">
                         <div className="grid gap-2">
-                            <Label htmlFor="password">Password</Label>
-                            <PasswordInput
+                            <Typography.Text>Password</Typography.Text>
+                            <Input.Password
                                 id="password"
                                 name="password"
                                 placeholder="Password"
@@ -31,9 +28,11 @@ export default function ConfirmPassword() {
                             <Button
                                 className="w-full"
                                 disabled={processing}
+                                htmlType="submit"
+                                type="primary"
                                 data-test="confirm-password-button"
                             >
-                                {processing && <Spinner />}
+                                {processing && <Spin size="small" />}
                                 Confirm password
                             </Button>
                         </div>

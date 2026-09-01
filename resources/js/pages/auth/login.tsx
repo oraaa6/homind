@@ -1,8 +1,11 @@
 import { LockOutlined, MailOutlined } from '@ant-design/icons';
 import { Head, Link, useForm } from '@inertiajs/react';
-import { Checkbox, Flex, Form, Input } from 'antd';
+import { Alert, Checkbox, Flex, Form, Input, Spin } from 'antd';
 import type { ReactNode } from 'react';
-import AuthLayout from '@/layouts/auth/AuthLayout';
+import Button from '@/components/Button';
+import AuthLayout from '@/layouts/auth/auth-layout';
+import { store as loginStore } from '@/routes/login';
+import { request as passwordRequest } from '@/routes/password';
 
 type Props = {
     status?: string;
@@ -25,7 +28,7 @@ export default function Login({ status, canResetPassword }: Props) {
         });
 
     const handleSubmit = () => {
-        post(route('login'), {
+        post(loginStore.url(), {
             onFinish: () => reset('password'),
             onError: () => reset('password'),
         });
@@ -34,6 +37,13 @@ export default function Login({ status, canResetPassword }: Props) {
     return (
         <>
             <Head title="Log in" />
+
+            <div className="mb-12">
+                <h1 className="heading-3 mb-3">Zaloguj się</h1>
+                <p className="body-medium">
+                    Zarządzaj swoim domem w jednym miejscu.
+                </p>
+            </div>
 
             <Form onFinish={handleSubmit} layout="vertical">
                 <Form.Item
@@ -71,7 +81,18 @@ export default function Login({ status, canResetPassword }: Props) {
                     />
                 </Form.Item>
 
-                <Form.Item className="!mb-6">
+                <Button
+                    className="mt-12 w-full"
+                    htmlType="submit"
+                    data-test="register-user-button"
+                    type="primary"
+                    disabled={!data.email || !data.password}
+                >
+                    {processing && <Spin />}
+                    Zaloguj się
+                </Button>
+
+                <Form.Item className="mt-2! mb-6!">
                     <Flex justify="space-between" align="center">
                         <Checkbox
                             checked={data.remember as boolean}
@@ -83,19 +104,34 @@ export default function Login({ status, canResetPassword }: Props) {
                         </Checkbox>
 
                         {canResetPassword && (
-                            <Link href={route('password.request')}>
+                            <Link
+                                href={passwordRequest()}
+                                className="text-primary"
+                            >
                                 Nie pamiętasz hasła?
                             </Link>
                         )}
                     </Flex>
                 </Form.Item>
-            </Form>
 
-            {status && (
-                <div className="mb-4 text-center text-sm font-medium text-green-600">
-                    {status}
-                </div>
-            )}
+                {status && (
+                    <Alert
+                        title={status}
+                        type="success"
+                        showIcon
+                        className="mb-6 rounded-lg"
+                    />
+                )}
+
+                {errors.email || errors.password ? (
+                    <Alert
+                        title="Nieprawidłowy e-mail lub hasło"
+                        type="error"
+                        showIcon
+                        className="mb-6!"
+                    />
+                ) : null}
+            </Form>
         </>
     );
 }

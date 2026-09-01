@@ -1,8 +1,7 @@
 import { Link } from '@inertiajs/react';
+import { Button, Divider } from 'antd';
 import type { PropsWithChildren } from 'react';
 import Heading from '@/components/heading';
-import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
 import { useCurrentUrl } from '@/hooks/use-current-url';
 import { cn, toUrl } from '@/lib/utils';
 import { edit } from '@/routes/profile';
@@ -41,17 +40,22 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
                         {sidebarNavItems.map((item, index) => (
                             <Button
                                 key={`${toUrl(item.href)}-${index}`}
-                                size="sm"
-                                variant="ghost"
-                                asChild
+                                type={
+                                    isCurrentOrParentUrl(item.href)
+                                        ? 'primary'
+                                        : 'text'
+                                }
                                 className={cn('w-full justify-start', {
-                                    'bg-muted': isCurrentOrParentUrl(item.href),
+                                    'bg-muted': !isCurrentOrParentUrl(
+                                        item.href,
+                                    ),
                                 })}
                             >
-                                <Link href={item.href}>
-                                    {item.icon && (
-                                        <item.icon className="h-4 w-4" />
-                                    )}
+                                <Link
+                                    href={item.href}
+                                    className="flex w-full items-center gap-2"
+                                >
+                                    {item.icon}
                                     {item.title}
                                 </Link>
                             </Button>
@@ -59,7 +63,7 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
                     </nav>
                 </aside>
 
-                <Separator className="my-6 lg:hidden" />
+                <Divider className="my-6 lg:hidden" />
 
                 <div className="flex-1 md:max-w-2xl">
                     <section className="max-w-xl space-y-12">

@@ -1,5 +1,3 @@
-import { Toaster } from '@/components/ui/sonner';
-import { TooltipProvider } from '@/components/ui/tooltip';
 import { initializeTheme } from '@/hooks/use-appearance';
 import AppLayout from '@/layouts/app-layout';
 import AuthLayout from '@/layouts/auth-layout';
@@ -26,14 +24,7 @@ createInertiaApp({
     },
     strictMode: true,
     withApp(app) {
-        return (
-            <ConfigProvider theme={antdTheme}>
-                <TooltipProvider delayDuration={0}>
-                    {app}
-                    <Toaster />
-                </TooltipProvider>
-            </ConfigProvider>
-        );
+        return <ConfigProvider theme={antdTheme}>{app}</ConfigProvider>;
     },
     progress: {
         color: '#4B5563',

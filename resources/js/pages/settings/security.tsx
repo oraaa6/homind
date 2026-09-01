@@ -1,11 +1,10 @@
 import { Form, Head } from '@inertiajs/react';
+import { Button, Input, Typography } from 'antd';
+import type { InputRef } from 'antd';
 import { useRef } from 'react';
 import SecurityController from '@/actions/App/Http/Controllers/Settings/SecurityController';
 import Heading from '@/components/heading';
 import InputError from '@/components/input-error';
-import PasswordInput from '@/components/password-input';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
 import { edit } from '@/routes/security';
 
 type Props = {
@@ -13,8 +12,8 @@ type Props = {
 };
 
 export default function Security(props: Props) {
-    const passwordInput = useRef<HTMLInputElement>(null);
-    const currentPasswordInput = useRef<HTMLInputElement>(null);
+    const passwordInput = useRef<InputRef>(null);
+    const currentPasswordInput = useRef<InputRef>(null);
 
     return (
         <>
@@ -54,11 +53,11 @@ export default function Security(props: Props) {
                     {({ errors, processing }) => (
                         <>
                             <div className="grid gap-2">
-                                <Label htmlFor="current_password">
+                                <Typography.Text>
                                     Current password
-                                </Label>
+                                </Typography.Text>
 
-                                <PasswordInput
+                                <Input.Password
                                     id="current_password"
                                     ref={currentPasswordInput}
                                     name="current_password"
@@ -71,9 +70,9 @@ export default function Security(props: Props) {
                             </div>
 
                             <div className="grid gap-2">
-                                <Label htmlFor="password">New password</Label>
+                                <Typography.Text>New password</Typography.Text>
 
-                                <PasswordInput
+                                <Input.Password
                                     id="password"
                                     ref={passwordInput}
                                     name="password"
@@ -87,11 +86,11 @@ export default function Security(props: Props) {
                             </div>
 
                             <div className="grid gap-2">
-                                <Label htmlFor="password_confirmation">
+                                <Typography.Text>
                                     Confirm password
-                                </Label>
+                                </Typography.Text>
 
-                                <PasswordInput
+                                <Input.Password
                                     id="password_confirmation"
                                     name="password_confirmation"
                                     className="mt-1 block w-full"
@@ -108,6 +107,8 @@ export default function Security(props: Props) {
                             <div className="flex items-center gap-4">
                                 <Button
                                     disabled={processing}
+                                    htmlType="submit"
+                                    type="primary"
                                     data-test="update-password-button"
                                 >
                                     Save
