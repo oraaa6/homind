@@ -18,7 +18,7 @@ export default function Register() {
     const handleSubmit = () => {
         post(registerStore.url(), {
             onSuccess: () => {
-                message.success('Udało się załozyc konto!');
+                message.success('Udało się założyć konto!');
             },
         });
     };
@@ -30,7 +30,7 @@ export default function Register() {
                 <div className="mb-12">
                     <h1 className="heading-3 mb-3">Witamy!</h1>
                     <p className="body-medium">
-                        Zarejestruj się i ogranij dom już dziś!
+                        Zarejestruj się i ogarnij dom już dziś!
                     </p>
                 </div>
 
@@ -68,7 +68,6 @@ export default function Register() {
                                 }
                                 name="email"
                                 type="email"
-                                autoFocus
                                 size="large"
                             />
                         </Form.Item>

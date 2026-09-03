@@ -1,6 +1,6 @@
 import { Head } from '@inertiajs/react';
 import clsx from 'clsx';
-import Button from '@/components/button';
+import Button from '@/components/Button';
 import { login, register } from '@/routes';
 import styles from './styles.module.css';
 

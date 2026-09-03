@@ -84,7 +84,7 @@ export default function Login({ status, canResetPassword }: Props) {
                 <Button
                     className="mt-12 w-full"
                     htmlType="submit"
-                    data-test="register-user-button"
+                    data-test="login-user-button"
                     type="primary"
                     disabled={!data.email || !data.password}
                 >
