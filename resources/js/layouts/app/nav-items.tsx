@@ -13,7 +13,7 @@ import {
 } from '@ant-design/icons';
 import { Link, router } from '@inertiajs/react';
 import type { MenuProps } from 'antd';
-import { dashboard, logout } from '@/routes';
+import { dashboard, logout, toDo } from '@/routes';
 import { edit as editProfile } from '@/routes/profile';
 
 export type NavItems = NonNullable<MenuProps['items']>;
@@ -31,9 +31,9 @@ export function getNavItems(): NavItems {
                     label: <Link href={dashboard()}>Dashboard</Link>,
                 },
                 {
-                    key: 'todo',
+                    key: toDo.url(),
                     icon: <CheckSquareOutlined />,
-                    label: 'Do ogarnięcia',
+                    label: <Link href={toDo()}>Do ogarnięcia</Link>,
                 },
             ],
         },

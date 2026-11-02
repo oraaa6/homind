@@ -1,0 +1,55 @@
+.categorySegmented:global(.ant-segmented) {
+    display: flex;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    gap: 0.625rem;
+}
+
+.categorySegmented :global(.ant-segmented-group) {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.625rem;
+}
+
+.categorySegmented :global(.ant-segmented-item) {
+    flex: 0 0 auto;
+    border: 1px solid var(--color-border);
+    border-radius: 9999px;
+    background: var(--white);
+    color: var(--button-text);
+    font-size: 0.875rem;
+    font-weight: 700;
+    box-shadow: 0 1px 2px var(--todo-filter-shadow);
+}
+
+.categorySegmented :global(.ant-segmented-item:hover) {
+    background: var(--todo-action-bg);
+    color: var(--primary);
+}
+
+.categorySegmented :global(.ant-segmented-item-label) {
+    min-height: 2.375rem;
+    padding: 0 1.25rem;
+    line-height: 2.375rem;
+}
+
+.categorySegmented :global(.ant-segmented-item.ant-segmented-item-selected),
+.categorySegmented
+    :global(.ant-segmented-item.ant-segmented-item-selected:hover),
+.categorySegmentedItemActive,
+.categorySegmentedItemActive:hover {
+    border-color: var(--primary) !important;
+    background: var(--primary) !important;
+    color: var(--white) !important;
+}
+
+.categorySegmented
+    :global(.ant-segmented-item-selected .ant-segmented-item-label),
+.categorySegmentedItemActive :global(.ant-segmented-item-label) {
+    color: var(--white) !important;
+}
+
+.categorySegmented :global(.ant-segmented-thumb) {
+    display: none;
+}

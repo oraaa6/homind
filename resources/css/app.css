@@ -20,6 +20,26 @@
     --color-muted: var(--tertiary);
     --color-muted-foreground: var(--neutral);
     --color-border: #d2d5ce;
+    --color-todo-danger: var(--todo-danger);
+    --color-todo-danger-surface: var(--todo-danger-surface);
+    --color-todo-danger-muted-surface: var(--todo-danger-muted-surface);
+    --color-todo-primary: var(--todo-primary);
+    --color-todo-primary-surface: var(--todo-primary-surface);
+    --color-todo-indigo: var(--todo-indigo);
+    --color-todo-muted: var(--todo-muted);
+    --color-todo-muted-strong: var(--todo-muted-strong);
+    --color-todo-muted-surface: var(--todo-muted-surface);
+    --color-todo-muted-surface-alt: var(--todo-muted-surface-alt);
+    --color-todo-muted-alt: var(--todo-muted-alt);
+    --color-todo-card-border: var(--todo-card-border);
+    --color-todo-divider: var(--todo-divider);
+    --color-todo-filter-divider: var(--todo-filter-divider);
+    --color-todo-action-bg: var(--todo-action-bg);
+    --color-todo-card-title: var(--todo-card-title);
+    --color-todo-title: var(--todo-title);
+    --color-todo-subtle-text: var(--todo-subtle-text);
+    --color-todo-accent-danger: var(--todo-accent-danger);
+    --color-todo-accent-primary: var(--todo-accent-primary);
     --breakpoint-3xl: 1980px;
 }
 
@@ -129,6 +149,28 @@
     --white: #fff;
 
     --surface-muted: #f0ede4;
+
+    --todo-danger: #ca211d;
+    --todo-danger-surface: #ffe1de;
+    --todo-danger-muted-surface: #fff0ed;
+    --todo-primary: #0b3b8f;
+    --todo-primary-surface: #dbe9ff;
+    --todo-indigo: #4665b8;
+    --todo-muted: #8b96a7;
+    --todo-muted-strong: #667085;
+    --todo-muted-surface: #eef0f4;
+    --todo-muted-surface-alt: #f0f2f5;
+    --todo-muted-alt: #8090a5;
+    --todo-card-border: #e1e6ef;
+    --todo-divider: #e2e6ed;
+    --todo-filter-divider: #dde2ea;
+    --todo-action-bg: #f6f5ef;
+    --todo-card-title: #3b4452;
+    --todo-title: #20232a;
+    --todo-subtle-text: #8490a3;
+    --todo-accent-danger: #d92320;
+    --todo-accent-primary: #b7c9ea;
+    --todo-filter-shadow: #0f172a14;
 
     /* Radius */
     --radius-default: 0.25rem;

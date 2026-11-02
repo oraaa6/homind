@@ -14,8 +14,8 @@ function Topbar() {
     const { Search } = Input;
 
     return (
-        <div className="flex flex-col-reverse gap-3 border-b border-neutral/25 bg-background px-4 py-4 sm:h-18! sm:flex-row sm:items-center sm:justify-between sm:px-8! sm:py-0">
-            <Search
+        <div className="flex w-full flex-col-reverse gap-3 border-b border-neutral/25 bg-background px-4 py-4 sm:h-18! sm:flex-row sm:items-center sm:justify-between sm:px-8! sm:py-0">
+            {/* <Search
                 placeholder="Szukaj..."
                 className="w-full sm:max-w-xl"
                 classNames={{
@@ -24,8 +24,8 @@ function Topbar() {
                         icon: 'text-primary!',
                     },
                 }}
-            />
-            <div className="flex w-full items-center justify-end gap-3 sm:w-auto sm:gap-6">
+            /> */}
+            <div className="ml-auto flex w-full items-center justify-end gap-3 sm:w-auto sm:gap-6">
                 <Badge count={2} offset={[-5, 10]}>
                     <Button
                         type="text"
@@ -134,7 +134,9 @@ export default function BaseLayout({ children }: AppLayoutProps) {
             <Layout>
                 <Topbar />
                 <Content>
-                    <div className="mx-auto w-full px-8 py-20">{children}</div>
+                    <div className="mx-auto w-full px-[1rem] py-[2.5rem] md:px-[1.5rem]">
+                        {children}
+                    </div>
                 </Content>
             </Layout>
         </Layout>
