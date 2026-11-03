@@ -1,0 +1,112 @@
+.table :global(.ant-table) {
+    background: transparent;
+}
+
+.table :global(table) {
+    border-collapse: separate;
+    border-spacing: 0 0.75rem;
+}
+
+.table :global(.ant-table-tbody > tr > td) {
+    padding: 1rem;
+    border-bottom: 0;
+    background: var(--white) !important;
+}
+
+.table :global(.ant-table-tbody > tr > td:first-child) {
+    border-start-start-radius: 1rem;
+    border-end-start-radius: 1rem;
+}
+
+.table :global(.ant-table-tbody > tr > td:last-child) {
+    border-start-end-radius: 1rem;
+    border-end-end-radius: 1rem;
+}
+
+.table :global(.ant-table-row) {
+    border-radius: 1rem;
+    box-shadow: 0 1px 2px var(--todo-filter-shadow);
+}
+
+.table :global(.ant-table-pagination.ant-pagination) {
+    row-gap: 0.75rem;
+    margin: 1.5rem 0 0;
+}
+
+.table :global(.ant-pagination .ant-pagination-total-text) {
+    height: auto;
+    margin-inline-end: auto;
+    color: var(--button-text);
+    font-size: 0.875rem;
+}
+
+.table :global(.ant-pagination .ant-pagination-item) {
+    border: 0;
+    background: transparent;
+}
+
+.table :global(.ant-pagination .ant-pagination-item-active) {
+    background: color-mix(in srgb, var(--primary) 10%, transparent);
+}
+
+@media (width < 40rem) {
+    .table :global(.ant-table-pagination.ant-pagination) {
+        justify-content: center;
+    }
+
+    .table :global(.ant-pagination .ant-pagination-total-text) {
+        width: 100%;
+        margin: 0;
+        font-size: 0.75rem;
+        text-align: center;
+    }
+}
+
+@media (width >= 40rem) {
+    .table :global(.ant-table-tbody > tr > td) {
+        padding: 1.25rem;
+    }
+}
+
+@media (width < 80rem) {
+    .table :global(.ant-table-content) {
+        overflow-x: auto;
+    }
+
+    .cards :global(table) {
+        display: block;
+        width: 100%;
+    }
+
+    .cards :global(colgroup) {
+        display: none;
+    }
+
+    .cards :global(.ant-table-tbody) {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        width: 100%;
+    }
+
+    .cards :global(.ant-table-row) {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        align-items: center;
+        gap: 0.75rem;
+        padding: 1rem;
+        background: var(--white);
+    }
+
+    .cards :global(.ant-table-tbody > .ant-table-row > td) {
+        display: block;
+        min-width: 0;
+        padding: 0;
+        border-radius: 0;
+    }
+
+    .cards :global(.ant-table-row > td:first-child),
+    .cards :global(.ant-table-row > td:last-child) {
+        grid-column: 1 / -1;
+    }
+}

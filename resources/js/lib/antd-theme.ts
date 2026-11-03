@@ -1,4 +1,18 @@
-import type { ThemeConfig } from 'antd';
+import type { ConfigProviderProps, ThemeConfig } from 'antd';
+
+export const antdInputSearchConfig: NonNullable<
+    ConfigProviderProps['inputSearch']
+> = {
+    styles: {
+        button: {
+            root: {
+                backgroundColor: 'var(--primary)',
+                borderColor: 'var(--primary)',
+                color: 'var(--white)',
+            },
+        },
+    },
+};
 
 export const antdTheme: ThemeConfig = {
     token: {
@@ -16,6 +30,26 @@ export const antdTheme: ThemeConfig = {
         colorFillTertiary: '#f9f7f2',
         borderRadius: 8,
         fontFamily: 'Inter, system-ui, sans-serif',
+        screenXS: 0,
+        screenXSMin: 0,
+        screenXSMax: 639,
+        screenSM: 640,
+        screenSMMin: 640,
+        screenSMMax: 767,
+        screenMD: 768,
+        screenMDMin: 768,
+        screenMDMax: 1023,
+        screenLG: 1024,
+        screenLGMin: 1024,
+        screenLGMax: 1279,
+        screenXL: 1280,
+        screenXLMin: 1280,
+        screenXLMax: 1535,
+        screenXXL: 1536,
+        screenXXLMin: 1536,
+        screenXXLMax: 1979,
+        screenXXXL: 1980,
+        screenXXXLMin: 1980,
     },
     components: {
         Button: {
@@ -47,13 +81,13 @@ export const antdTheme: ThemeConfig = {
             fontWeight: 500,
             controlHeightLG: 52,
             controlHeight: 46,
-            controlHeightSM: 40,
+            controlHeightSM: 36,
             paddingInlineLG: 32,
             paddingInline: 28,
-            paddingInlineSM: 20,
+            paddingInlineSM: 16,
             contentFontSizeLG: 20,
             contentFontSize: 18,
-            contentFontSizeSM: 16,
+            contentFontSizeSM: 14,
         },
         Form: {
             labelColor: '#1b1c1a',

@@ -13,7 +13,7 @@ import {
 } from '@ant-design/icons';
 import { Link, router } from '@inertiajs/react';
 import type { MenuProps } from 'antd';
-import { dashboard, logout, toDo } from '@/routes';
+import { dashboard, logout, things, toDo } from '@/routes';
 import { edit as editProfile } from '@/routes/profile';
 
 export type NavItems = NonNullable<MenuProps['items']>;
@@ -45,7 +45,7 @@ export function getNavItems(): NavItems {
                 {
                     key: 'items',
                     icon: <DatabaseOutlined />,
-                    label: 'Przedmioty',
+                    label: <Link href={things()}>Przedmioty</Link>,
                 },
                 {
                     key: 'locations',

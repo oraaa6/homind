@@ -1,10 +1,10 @@
+import { createInertiaApp } from '@inertiajs/react';
+import { ConfigProvider } from 'antd';
 import { initializeTheme } from '@/hooks/use-appearance';
 import AppLayout from '@/layouts/app-layout';
 import AuthLayout from '@/layouts/auth-layout';
 import SettingsLayout from '@/layouts/settings/layout';
-import { antdTheme } from '@/lib/antd-theme';
-import { createInertiaApp } from '@inertiajs/react';
-import { ConfigProvider } from 'antd';
+import { antdInputSearchConfig, antdTheme } from '@/lib/antd-theme';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
@@ -24,7 +24,14 @@ createInertiaApp({
     },
     strictMode: true,
     withApp(app) {
-        return <ConfigProvider theme={antdTheme}>{app}</ConfigProvider>;
+        return (
+            <ConfigProvider
+                theme={antdTheme}
+                inputSearch={antdInputSearchConfig}
+            >
+                {app}
+            </ConfigProvider>
+        );
     },
     progress: {
         color: '#4B5563',
