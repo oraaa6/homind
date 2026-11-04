@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\HouseholdController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -7,6 +8,8 @@ Route::inertia('/', 'welcome')->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::inertia('dashboard', 'dashboard')->name('dashboard');
+
+    Route::post('households', [HouseholdController::class, 'store'])->name('households.store');
 
     Route::inertia('to-do', 'to-do/index')->name('to-do');
 

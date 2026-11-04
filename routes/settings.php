@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\HouseholdController;
 use App\Http\Controllers\Settings\ProfileController;
 use App\Http\Controllers\Settings\SecurityController;
 use Illuminate\Auth\Middleware\RequirePassword;
@@ -24,4 +25,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->name('user-password.update');
 
     Route::inertia('settings/appearance', 'settings/appearance')->name('appearance.edit');
+
+    Route::get('settings/households/{household}', [HouseholdController::class, 'editSettings'])
+        ->name('households.settings');
+    Route::patch('settings/households/{household}', [HouseholdController::class, 'update'])
+        ->name('households.update');
+    Route::post('settings/households/{household}/members', [HouseholdController::class, 'addMember'])
+        ->name('households.members.store');
 });

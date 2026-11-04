@@ -41,6 +41,9 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => $request->user(),
             ],
+            'households' => fn () => $request->user()
+                ? $request->user()->households()->orderBy('households.name')->get(['households.id', 'households.name'])
+                : [],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
         ];
     }

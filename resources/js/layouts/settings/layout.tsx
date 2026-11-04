@@ -1,76 +1,33 @@
-import { Link } from '@inertiajs/react';
-import { Button, Divider } from 'antd';
+import { usePage } from '@inertiajs/react';
 import clsx from 'clsx';
 import type { PropsWithChildren } from 'react';
 import Heading from '@/components/heading';
-import { useCurrentUrl } from '@/hooks/use-current-url';
-import { toUrl } from '@/lib/utils';
-import { edit } from '@/routes/profile';
-import { edit as editSecurity } from '@/routes/security';
-import type { NavItem } from '@/types';
-
-const sidebarNavItems: NavItem[] = [
-    {
-        title: 'Profile',
-        href: edit(),
-        icon: null,
-    },
-    {
-        title: 'Security',
-        href: editSecurity(),
-        icon: null,
-    },
-];
 
 export default function SettingsLayout({ children }: PropsWithChildren) {
-    const { isCurrentOrParentUrl } = useCurrentUrl();
+    const { url } = usePage();
+    const isHouseholdSettings = url.startsWith('/settings/households/');
 
     return (
         <div className="px-4 py-6">
             <Heading
-                title="Settings"
-                description="Manage your profile and account settings"
+                title="Ustawienia"
+                description="Zarządzaj kontem i ustawieniami domu."
             />
 
-            <div className="flex flex-col lg:flex-row lg:space-x-12">
-                <aside className="w-full max-w-xl lg:w-48">
-                    <nav
-                        className="flex flex-col space-y-1 space-x-0"
-                        aria-label="Settings"
-                    >
-                        {sidebarNavItems.map((item, index) => (
-                            <Button
-                                key={`${toUrl(item.href)}-${index}`}
-                                type={
-                                    isCurrentOrParentUrl(item.href)
-                                        ? 'primary'
-                                        : 'text'
-                                }
-                                className={clsx('w-full justify-start', {
-                                    'bg-muted': !isCurrentOrParentUrl(
-                                        item.href,
-                                    ),
-                                })}
-                            >
-                                <Link
-                                    href={item.href}
-                                    className="flex w-full items-center gap-2"
-                                >
-                                    {item.icon}
-                                    {item.title}
-                                </Link>
-                            </Button>
-                        ))}
-                    </nav>
-                </aside>
-
-                <Divider className="my-6 lg:hidden" />
-
-                <div className="flex-1 md:max-w-2xl">
-                    <section className="max-w-xl space-y-12">
-                        {children}
-                    </section>
-                </div>
+            <div
+                className={clsx(
+                    'min-w-0',
+                    isHouseholdSettings ? 'w-full' : 'max-w-2xl',
+                )}
+            >
+                <section
+                    className={clsx(
+                        'space-y-6',
+                        !isHouseholdSettings && 'max-w-xl space-y-12',
+                    )}
+                >
+                    {children}
+                </section>
             </div>
         </div>
     );

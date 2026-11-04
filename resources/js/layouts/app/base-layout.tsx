@@ -1,8 +1,10 @@
 import { BellOutlined, PlusOutlined, QrcodeOutlined } from '@ant-design/icons';
-import { Avatar, Badge, Dropdown, Grid, Input, Layout, Menu } from 'antd';
+import { usePage } from '@inertiajs/react';
+import { Avatar, Badge, Dropdown, Grid, Layout, Menu } from 'antd';
 import clsx from 'clsx';
 import { useMemo, useState } from 'react';
 import Button from '@/components/Button';
+import RequiredHouseholdModal from '@/components/households/required-household-modal';
 import type { AppLayoutProps } from '@/types';
 import { useMenuItems } from '../../hooks/use-menu-items';
 import { getBottomNavItems, getDropdownItems, getNavItems } from './nav-items';
@@ -11,8 +13,6 @@ import styles from './styles.module.css';
 const { Sider, Content } = Layout;
 
 function Topbar() {
-    const { Search } = Input;
-
     return (
         <div className="flex w-full flex-col-reverse gap-3 border-b border-neutral/25 bg-background px-4 py-4 sm:h-18! sm:flex-row sm:items-center sm:justify-between sm:px-8! sm:py-0">
             {/* <Search
@@ -51,11 +51,17 @@ function Topbar() {
 }
 
 export default function BaseLayout({ children }: AppLayoutProps) {
+    const { households = [] } = usePage<{
+        households?: { id: number; name: string }[];
+    }>().props;
     const screens = Grid.useBreakpoint();
     const isMobile = !screens.lg;
     const [collapsed, setCollapsed] = useState(isMobile);
     const navItems = useMemo(() => getNavItems(), []);
-    const bottomNavItems = useMemo(() => getBottomNavItems(), []);
+    const bottomNavItems = useMemo(
+        () => getBottomNavItems(households),
+        [households],
+    );
     const nav = useMenuItems(navItems);
     const bottomNav = useMenuItems(bottomNavItems);
 
@@ -132,13 +138,14 @@ export default function BaseLayout({ children }: AppLayoutProps) {
                 </div>
             </Sider>
             <Layout>
-                <Topbar />
+                {/* <Topbar /> */}
                 <Content>
                     <div className="mx-auto w-full px-[1rem] py-[2.5rem] md:px-[1.5rem]">
                         {children}
                     </div>
                 </Content>
             </Layout>
+            <RequiredHouseholdModal />
         </Layout>
     );
 }

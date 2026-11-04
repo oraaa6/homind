@@ -6,14 +6,16 @@ import {
     DatabaseOutlined,
     FileTextOutlined,
     HomeOutlined,
+    LogoutOutlined,
     QrcodeOutlined,
-    SettingOutlined,
     ShoppingCartOutlined,
     ToolOutlined,
+    UserOutlined,
 } from '@ant-design/icons';
 import { Link, router } from '@inertiajs/react';
 import type { MenuProps } from 'antd';
 import { dashboard, logout, places, things, toDo } from '@/routes';
+import { settings as householdSettings } from '@/routes/households';
 import { edit as editProfile } from '@/routes/profile';
 
 export type NavItems = NonNullable<MenuProps['items']>;
@@ -43,7 +45,7 @@ export function getNavItems(): NavItems {
             type: 'group',
             children: [
                 {
-                    key: 'items',
+                    key: things.url(),
                     icon: <DatabaseOutlined />,
                     label: <Link href={things()}>Przedmioty</Link>,
                 },
@@ -98,28 +100,49 @@ export function getNavItems(): NavItems {
     ];
 }
 
-export function getBottomNavItems(): NavItems {
+export function getBottomNavItems(
+    households: { id: number; name: string }[] = [],
+): NavItems {
     return [
+        ...(households.length
+            ? households.map((household) => ({
+                  key: householdSettings(household.id).url,
+                  icon: <HomeOutlined />,
+                  label: (
+                      <Link href={householdSettings(household.id)}>
+                          {households.length === 1 ? 'Dom' : household.name}
+                      </Link>
+                  ),
+              }))
+            : [
+                  {
+                      key: 'settings-household-required',
+                      icon: <HomeOutlined />,
+                      label: 'Dom',
+                      disabled: true,
+                  },
+              ]),
         {
-            key: '/settings',
-            icon: <SettingOutlined />,
-            label: <Link href={editProfile()}>Ustawienia</Link>,
+            key: editProfile.url(),
+            icon: <UserOutlined />,
+            label: <Link href={editProfile()}>Profil</Link>,
+        },
+        {
+            key: logout.url(),
+            icon: <LogoutOutlined />,
+            label: 'Wyloguj',
+            onClick: () => router.post(logout.url()),
         },
     ];
 }
 
 export const getDropdownItems: MenuProps['items'] = [
     {
-        label: <span>Wyloguj</span>,
-        key: '0',
-        onClick: () => router.post(logout.url()),
-    },
-    {
         label: (
             <Link href={editProfile()} className="text-primary">
                 Mój profil
             </Link>
         ),
-        key: '1',
+        key: 'profile',
     },
 ];

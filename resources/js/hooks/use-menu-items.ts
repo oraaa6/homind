@@ -1,3 +1,4 @@
+import { usePage } from '@inertiajs/react';
 import type { ItemType, MenuItemType } from 'antd/es/menu/interface';
 import { useMemo } from 'react';
 
@@ -21,8 +22,10 @@ function getAllKeys(items: ItemType[]): string[] {
 }
 
 export function useMenuItems(items: ItemType[]) {
+    const { url } = usePage();
+
     return useMemo(() => {
-        const pathname = window.location.pathname;
+        const pathname = url.split(/[?#]/, 1)[0];
         const selectedKey = getAllKeys(items)
             .filter((key) => pathname === key || pathname.startsWith(`${key}/`))
             .sort((a, b) => b.length - a.length)[0];
@@ -31,5 +34,5 @@ export function useMenuItems(items: ItemType[]) {
             items,
             selectedKeys: selectedKey ? [selectedKey] : [],
         };
-    }, [items]);
+    }, [items, url]);
 }
