@@ -1,8 +1,8 @@
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import { Link } from '@inertiajs/react';
-import type { ComponentProps } from 'react';
+import clsx from 'clsx';
+import type { ComponentProps, ReactNode } from 'react';
 import Button from '@/components/Button';
-import { cn } from '@/lib/utils';
 
 type HeadingButtonProps = Omit<ComponentProps<typeof Button>, 'type'>;
 
@@ -12,6 +12,7 @@ export default function Heading({
     variant = 'default',
     secondaryButtonProps,
     primaryButtonProps,
+    actions,
     backLink,
     className,
 }: {
@@ -20,14 +21,15 @@ export default function Heading({
     variant?: 'default' | 'small';
     secondaryButtonProps?: HeadingButtonProps;
     primaryButtonProps?: HeadingButtonProps;
+    actions?: ReactNode;
     backLink?: { href: string; label: string };
     className?: string;
 }) {
     return (
         <header
-            className={cn(
-                'mb-8 flex min-w-0 flex-col gap-4 xl:flex-row xl:items-end xl:justify-between xl:gap-6',
-                variant === 'small' && 'mb-0',
+            className={clsx(
+                'flex min-w-0 flex-col gap-4 xl:flex-row xl:items-end xl:justify-between xl:gap-6',
+                variant === 'small' ? 'mb-0' : 'mb-8',
                 className,
             )}
         >
@@ -56,8 +58,9 @@ export default function Heading({
                     </p>
                 )}
             </div>
-            {(secondaryButtonProps || primaryButtonProps) && (
+            {(actions || secondaryButtonProps || primaryButtonProps) && (
                 <div className="flex max-w-full flex-wrap items-center gap-2 sm:gap-3 xl:shrink-0">
+                    {actions}
                     {secondaryButtonProps && (
                         <Button
                             type="secondary"

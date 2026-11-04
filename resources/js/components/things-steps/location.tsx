@@ -68,7 +68,7 @@ export default function LocationStep({ form }: { form: ThingFormState }) {
                                 className={clsx(
                                     'm-0! flex! min-h-24 min-w-0 items-center! justify-start! rounded-xl border border-transparent p-4! text-left! sm:p-5! [&_.ant-radio]:hidden',
                                     selected
-                                        ? 'border-primary! bg-surface-muted! text-foreground!'
+                                        ? 'border-primary! bg-primary-soft! text-primary!'
                                         : 'bg-tertiary text-foreground!',
                                 )}
                             >

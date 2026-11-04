@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import type { ReactNode } from 'react';
 
 type StatisticsItem = {
@@ -7,9 +8,15 @@ type StatisticsItem = {
     description: ReactNode;
 };
 
-export default function Statistics({ items }: { items: StatisticsItem[] }) {
+export default function Statistics({
+    items,
+    valueClassName = 'whitespace-nowrap',
+}: {
+    items: StatisticsItem[];
+    valueClassName?: string;
+}) {
     return (
-        <dl className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-5 xl:grid-cols-4">
+        <dl className="grid grid-cols-1 gap-3 sm:grid-cols-[repeat(auto-fit,minmax(14rem,1fr))] sm:gap-5">
             {items.map((item) => (
                 <div
                     key={item.label}
@@ -19,7 +26,7 @@ export default function Statistics({ items }: { items: StatisticsItem[] }) {
                         <span className="text-xs font-semibold tracking-wide text-(--button-text) uppercase 2xl:text-sm">
                             {item.label}
                         </span>
-                        <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 2xl:size-10 2xl:rounded-xl">
+                        <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary-soft 2xl:size-10 2xl:rounded-xl">
                             <img
                                 src={item.icon}
                                 alt=""
@@ -28,7 +35,12 @@ export default function Statistics({ items }: { items: StatisticsItem[] }) {
                         </span>
                     </dt>
                     <dd>
-                        <p className="text-2xl leading-tight font-bold tracking-tight whitespace-nowrap text-foreground 2xl:text-[2.5rem]">
+                        <p
+                            className={clsx(
+                                'text-2xl leading-tight font-bold tracking-tight text-foreground 2xl:text-[2.5rem]',
+                                valueClassName,
+                            )}
+                        >
                             {item.value}
                         </p>
                         <div className="mt-1 flex items-center gap-1.5 text-xs font-medium text-(--button-text) 2xl:mt-2 2xl:gap-2 2xl:text-sm">

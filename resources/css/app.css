@@ -11,6 +11,7 @@
     --color-background: var(--background);
     --color-foreground: var(--text-primary);
     --color-primary: var(--primary);
+    --color-primary-soft: var(--primary-soft);
     --color-primary-foreground: var(--white);
     --color-secondary: var(--secondary);
     --color-secondary-foreground: var(--white);
@@ -49,6 +50,7 @@
     --background: #fbf9f6;
     --text-primary: #1b1c1a;
     --primary: #4a5d4e;
+    --primary-soft: color-mix(in oklab, var(--primary) 10%, transparent);
     --secondary: #242728;
     --tertiary: #f9f7f2;
     --neutral: #777775;

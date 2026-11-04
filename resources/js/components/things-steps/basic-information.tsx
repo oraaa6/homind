@@ -86,7 +86,7 @@ export default function BasicInformationStep({
                                         form.clearErrors('category');
                                     }
                                 }}
-                                className="m-0! rounded-full! border! border-transparent! bg-tertiary! px-4! py-2! text-sm! text-(--button-text)! hover:bg-surface-muted! sm:text-base! [&.ant-tag-checkable-checked]:border-primary! [&.ant-tag-checkable-checked]:bg-surface-muted! [&.ant-tag-checkable-checked]:text-foreground! [&.ant-tag-checkable-checked:hover]:bg-surface-muted!"
+                                className="m-0! rounded-full! border! border-transparent! bg-tertiary! px-4! py-2! text-sm! text-(--button-text)! hover:bg-surface-muted! sm:text-base! [&.ant-tag-checkable-checked]:border-primary! [&.ant-tag-checkable-checked]:bg-primary-soft! [&.ant-tag-checkable-checked]:text-primary! [&.ant-tag-checkable-checked:hover]:bg-primary-soft!"
                             >
                                 {category.label}
                             </Tag.CheckableTag>

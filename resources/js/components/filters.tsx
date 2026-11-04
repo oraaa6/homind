@@ -105,7 +105,7 @@ export default function Filters({
             <div className="order-2 flex h-10 items-center gap-2 rounded-xl bg-background px-3 text-xs text-(--button-text) focus-within:ring-2 focus-within:ring-primary/40 sm:h-11 sm:px-4 sm:text-sm xl:order-3">
                 <span>Sortuj:</span>
                 <Select
-                    aria-label="Sortuj przedmioty"
+                    aria-label="Sortuj pozycje"
                     value={sort}
                     onChange={onSortChange}
                     options={sortOptions}

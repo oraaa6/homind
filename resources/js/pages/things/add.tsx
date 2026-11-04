@@ -55,71 +55,69 @@ export default function AddThing() {
     return (
         <>
             <Head title="Dodaj nowy przedmiot" />
-            <div className="mx-auto max-w-6xl">
-                <Heading
-                    title="Dodaj nowy przedmiot"
-                    description="Zarejestruj fizyczny przedmiot w ewidencji domowej i przypisz jego stałe miejsce w przestrzeni."
-                    backLink={{
-                        href: things().url,
-                        label: 'Wróć do listy przedmiotów',
-                    }}
-                    className="mb-8 sm:mb-10"
-                />
+            <Heading
+                title="Dodaj nowy przedmiot"
+                description="Zarejestruj fizyczny przedmiot w ewidencji domowej i przypisz jego stałe miejsce w przestrzeni."
+                backLink={{
+                    href: things().url,
+                    label: 'Wróć do listy przedmiotów',
+                }}
+                className="mb-8 sm:mb-10"
+            />
 
-                <Form
-                    layout="vertical"
-                    noValidate
-                    onFinish={() => {
-                        if (!validate()) {
-                            return;
-                        }
+            <Form
+                layout="vertical"
+                noValidate
+                onFinish={() => {
+                    if (!validate()) {
+                        return;
+                    }
 
-                        message.info(
-                            'Zapis przedmiotu będzie dostępny po podłączeniu backendu.',
-                        );
-                    }}
-                    className="space-y-5 sm:space-y-7"
+                    message.info(
+                        'Zapis przedmiotu będzie dostępny po podłączeniu backendu.',
+                    );
+                }}
+                className="space-y-5 sm:space-y-7"
+            >
+                <BasicInformationStep form={form} />
+
+                <LocationStep form={form} />
+
+                <StorageStep form={form} />
+
+                <SectionCard
+                    as="div"
+                    className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between xl:p-9"
                 >
-                    <BasicInformationStep form={form} />
-
-                    <LocationStep form={form} />
-
-                    <StorageStep form={form} />
-
-                    <SectionCard
-                        as="div"
-                        className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between xl:p-9"
+                    <Link
+                        href={things().url}
+                        className="px-2 py-2 text-sm font-medium text-(--button-text) hover:text-primary sm:text-base"
                     >
-                        <Link
-                            href={things().url}
-                            className="px-2 py-2 text-sm font-medium text-(--button-text) hover:text-primary sm:text-base"
+                        Anuluj
+                    </Link>
+                    <div className="flex flex-col gap-2 sm:flex-row">
+                        <Button
+                            type="ghost"
+                            size="small"
+                            onClick={() =>
+                                message.info(
+                                    'Zapisywanie wersji roboczej będzie dostępne po podłączeniu backendu.',
+                                )
+                            }
                         >
-                            Anuluj
-                        </Link>
-                        <div className="flex flex-col gap-2 sm:flex-row">
-                            <Button
-                                type="ghost"
-                                size="small"
-                                onClick={() =>
-                                    message.info(
-                                        'Zapisywanie wersji roboczej będzie dostępne po podłączeniu backendu.',
-                                    )
-                                }
-                            >
-                                Zapisz jako wersję roboczą
-                            </Button>
-                            <Button
-                                type="primary"
-                                size="small"
-                                htmlType="submit"
-                                icon={<CheckOutlined />}
-                            >
-                                Zapisz i dodaj przedmiot
-                            </Button>
-                        </div>
-                    </SectionCard>
-                </Form>
-            </div>
+                            Zapisz jako wersję roboczą
+                        </Button>
+                        <Button
+                            type="primary"
+                            size="small"
+                            htmlType="submit"
+                            icon={<CheckOutlined />}
+                        >
+                            Zapisz i dodaj przedmiot
+                        </Button>
+                    </div>
+                </SectionCard>
+            </Form>
         </>
     );
 }

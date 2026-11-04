@@ -16,9 +16,16 @@ type ItemsTableProps = Omit<
     'columns' | 'dataSource' | 'rowKey'
 > & {
     items: ItemsTableRow[];
+    valueColumnWidth?: number;
+    actionsColumnWidth?: number;
 };
 
-export default function ItemsTable({ items, ...props }: ItemsTableProps) {
+export default function ItemsTable({
+    items,
+    valueColumnWidth = 112,
+    actionsColumnWidth = 128,
+    ...props
+}: ItemsTableProps) {
     const isMobile = !Grid.useBreakpoint().xl;
 
     const hasValue = items.some(
@@ -67,7 +74,7 @@ export default function ItemsTable({ items, ...props }: ItemsTableProps) {
     if (!isMobile && hasValue) {
         columns.push({
             key: 'value',
-            width: 112,
+            width: valueColumnWidth,
             align: 'right',
             render: (_, item) => (
                 <div className="text-foreground">
@@ -94,7 +101,7 @@ export default function ItemsTable({ items, ...props }: ItemsTableProps) {
     if (!isMobile && hasActions) {
         columns.push({
             key: 'actions',
-            width: 128,
+            width: actionsColumnWidth,
             align: 'right',
             render: (_, item) => item.actions,
         });

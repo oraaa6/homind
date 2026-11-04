@@ -73,7 +73,7 @@ export default function StorageStep({ form }: { form: ThingFormState }) {
                             className={clsx(
                                 'm-0! flex! rounded-xl border border-transparent p-4! sm:p-5!',
                                 form.data.storage === 'standalone'
-                                    ? 'border-primary! bg-surface-muted! text-foreground! [&_.ant-radio-inner]:border-(--button-text)! [&_.ant-radio-inner]:bg-(--white)! [&_.ant-radio-inner:after]:bg-(--button-text)!'
+                                    ? 'border-primary! bg-primary-soft! text-primary! [&_.ant-radio-inner]:border-primary! [&_.ant-radio-inner]:bg-(--white)! [&_.ant-radio-inner:after]:bg-primary!'
                                     : 'bg-tertiary text-foreground!',
                             )}
                         >
@@ -91,7 +91,7 @@ export default function StorageStep({ form }: { form: ThingFormState }) {
                             className={clsx(
                                 'm-0! flex! rounded-xl border border-transparent p-4! sm:p-5!',
                                 form.data.storage === 'container'
-                                    ? 'border-primary! bg-surface-muted! text-foreground! [&_.ant-radio-inner]:border-(--button-text)! [&_.ant-radio-inner]:bg-(--white)! [&_.ant-radio-inner:after]:bg-(--button-text)!'
+                                    ? 'border-primary! bg-primary-soft! text-primary! [&_.ant-radio-inner]:border-primary! [&_.ant-radio-inner]:bg-(--white)! [&_.ant-radio-inner:after]:bg-primary!'
                                     : 'bg-tertiary text-foreground!',
                             )}
                         >

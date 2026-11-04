@@ -1,9 +1,10 @@
 import { Link } from '@inertiajs/react';
 import { Button, Divider } from 'antd';
+import clsx from 'clsx';
 import type { PropsWithChildren } from 'react';
 import Heading from '@/components/heading';
 import { useCurrentUrl } from '@/hooks/use-current-url';
-import { cn, toUrl } from '@/lib/utils';
+import { toUrl } from '@/lib/utils';
 import { edit } from '@/routes/profile';
 import { edit as editSecurity } from '@/routes/security';
 import type { NavItem } from '@/types';
@@ -45,7 +46,7 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
                                         ? 'primary'
                                         : 'text'
                                 }
-                                className={cn('w-full justify-start', {
+                                className={clsx('w-full justify-start', {
                                     'bg-muted': !isCurrentOrParentUrl(
                                         item.href,
                                     ),

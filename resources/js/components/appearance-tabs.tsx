@@ -1,9 +1,8 @@
 import { SunOutlined } from '@ant-design/icons';
-import type { ComponentType } from 'react';
-import type { HTMLAttributes } from 'react';
+import clsx from 'clsx';
+import type { ComponentType, HTMLAttributes } from 'react';
 import type { Appearance } from '@/hooks/use-appearance';
 import { useAppearance } from '@/hooks/use-appearance';
-import { cn } from '@/lib/utils';
 
 export default function AppearanceToggleTab({
     className = '',
@@ -19,7 +18,7 @@ export default function AppearanceToggleTab({
 
     return (
         <div
-            className={cn(
+            className={clsx(
                 'inline-flex gap-1 rounded-lg bg-neutral-100 p-1 dark:bg-neutral-800',
                 className,
             )}
@@ -29,7 +28,7 @@ export default function AppearanceToggleTab({
                 <button
                     key={value}
                     onClick={() => updateAppearance(value)}
-                    className={cn(
+                    className={clsx(
                         'flex items-center rounded-md px-3.5 py-1.5 transition-colors',
                         appearance === value
                             ? 'bg-white shadow-xs dark:bg-neutral-700 dark:text-neutral-100'

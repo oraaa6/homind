@@ -13,7 +13,7 @@ import {
 } from '@ant-design/icons';
 import { Link, router } from '@inertiajs/react';
 import type { MenuProps } from 'antd';
-import { dashboard, logout, things, toDo } from '@/routes';
+import { dashboard, logout, places, things, toDo } from '@/routes';
 import { edit as editProfile } from '@/routes/profile';
 
 export type NavItems = NonNullable<MenuProps['items']>;
@@ -48,9 +48,9 @@ export function getNavItems(): NavItems {
                     label: <Link href={things()}>Przedmioty</Link>,
                 },
                 {
-                    key: 'locations',
+                    key: places.url(),
                     icon: <HomeOutlined />,
-                    label: 'Lokalizacje',
+                    label: <Link href={places()}>Lokalizacje</Link>,
                 },
                 {
                     key: 'maintenance',
