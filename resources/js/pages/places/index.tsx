@@ -7,48 +7,9 @@ import Heading from '@/components/heading';
 import ItemsTable from '@/components/items-table';
 import { placeKinds } from '@/components/places/place-kinds';
 import Statistics from '@/components/statistics';
-import { mockThings } from '@/pages/things/data';
 import { places } from '@/routes';
 import { add as addPlace, show as showPlace } from '@/routes/places';
-import { getPlaceThings, mockPlaces } from './data';
-
-const statistics = [
-    {
-        label: 'Wszystkie strefy',
-        value: String(
-            mockPlaces.filter((place) => place.kind === 'room').length,
-        ),
-        icon: '/icons/zone.svg',
-        description: 'Pomieszczenia i otoczenie domu',
-    },
-    {
-        label: 'Pudełka z kodem QR',
-        value: String(
-            mockPlaces.filter((place) => place.kind === 'box' && place.qrCode)
-                .length,
-        ),
-        icon: '/icons/qr-box.svg',
-        description: 'Oznaczone pojemniki',
-    },
-    {
-        label: 'Skatalogowane rzeczy',
-        value: String(mockThings.length),
-        icon: '/icons/catalog.svg',
-        description: 'Przypisane do stref',
-    },
-];
-
-const filters = [
-    { value: 'all', label: 'Wszystkie' },
-    { value: 'room', label: 'Pomieszczenia' },
-    { value: 'box', label: 'Pudełka' },
-    { value: 'rack', label: 'Regały' },
-].map((option) => ({
-    ...option,
-    count: mockPlaces.filter(
-        (place) => option.value === 'all' || place.kind === option.value,
-    ).length,
-}));
+import type { Place } from './data';
 
 const sortOptions = [
     { value: 'newest', label: 'Najnowsze' },
@@ -56,14 +17,14 @@ const sortOptions = [
     { value: 'name', label: 'Nazwa A–Z' },
 ];
 
-export default function Places() {
+export default function Places({ places: placesData }: { places: Place[] }) {
     const [filter, setFilter] = useState('all');
     const [searchInput, setSearchInput] = useState('');
     const [search, setSearch] = useState('');
     const [sort, setSort] = useState('newest');
     const [page, setPage] = useState(1);
     const query = search.trim().toLocaleLowerCase('pl');
-    const filteredPlaces = mockPlaces
+    const filteredPlaces = placesData
         .filter(
             (place) =>
                 (filter === 'all' || place.kind === filter) &&
@@ -82,23 +43,21 @@ export default function Places() {
         });
 
     const tableItems = filteredPlaces.map((place) => {
-        const parent = mockPlaces.find((item) => item.id === place.parentId);
-
         return {
             id: place.id,
             title: place.name,
-            description: parent && (
+            description: (
                 <>
                     <EnvironmentOutlined
                         className="mt-0.5 shrink-0"
                         aria-hidden="true"
                     />
-                    {parent.name}
+                    {place.parentName ?? 'Bez pomieszczenia nadrzędnego'}
                 </>
             ),
             value: (
                 <span className="text-sm whitespace-nowrap sm:text-base">
-                    Przedmioty: {getPlaceThings(place.id).length}
+                    Przedmioty: 0
                 </span>
             ),
             status: (
@@ -117,6 +76,41 @@ export default function Places() {
             ),
         };
     });
+
+    const statistics = [
+        {
+            label: 'Wszystkie strefy',
+            value: String(placesData.filter((place) => place.kind === 'room').length),
+            icon: '/icons/zone.svg',
+            description: 'Pomieszczenia i otoczenie domu',
+        },
+        {
+            label: 'Pudełka z kodem QR',
+            value: String(
+                placesData.filter((place) => place.kind === 'box' && place.qrCode).length,
+            ),
+            icon: '/icons/qr-box.svg',
+            description: 'Oznaczone pojemniki',
+        },
+        {
+            label: 'Skatalogowane rzeczy',
+            value: '0',
+            icon: '/icons/catalog.svg',
+            description: 'Przypisane do stref',
+        },
+    ];
+
+    const filters = [
+        { value: 'all', label: 'Wszystkie' },
+        { value: 'room', label: 'Pomieszczenia' },
+        { value: 'box', label: 'Pudełka' },
+        { value: 'rack', label: 'Regały' },
+    ].map((option) => ({
+        ...option,
+        count: placesData.filter(
+            (place) => option.value === 'all' || place.kind === option.value,
+        ).length,
+    }));
 
     return (
         <>

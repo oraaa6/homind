@@ -1,19 +1,28 @@
 import { AppstoreOutlined, EnvironmentOutlined } from '@ant-design/icons';
-import { Form, Input, Select } from 'antd';
+import { Alert, Form, Input, Select } from 'antd';
 import SectionCard from '@/components/section-card';
-import { mockPlaces } from '@/pages/places/data';
 import type { PlaceFormState } from '@/pages/places/form-types';
 
-const roomOptions = mockPlaces
-    .filter((place) => place.kind === 'room')
-    .map((place) => ({ value: place.id, label: place.name }));
+type HouseholdOption = { id: number; name: string };
+export type RoomOption = {
+    id: number;
+    household_id: number;
+    name: string;
+};
 
 export default function BasicInformationStep({
     form,
+    households,
+    rooms,
 }: {
     form: PlaceFormState;
+    households: HouseholdOption[];
+    rooms: RoomOption[];
 }) {
     const isRoom = form.data.kind === 'room';
+    const roomOptions = rooms
+        .filter((room) => room.household_id === form.data.household_id)
+        .map((room) => ({ value: room.id, label: room.name }));
 
     return (
         <SectionCard
@@ -22,6 +31,29 @@ export default function BasicInformationStep({
             description="Określ nazwę oraz fizyczne przypisanie w strukturze domu"
             className="xl:p-9"
         >
+            <Form.Item
+                label="Dom"
+                required
+                validateStatus={form.errors.household_id ? 'error' : ''}
+                help={form.errors.household_id}
+            >
+                <Select
+                    size="large"
+                    value={form.data.household_id || undefined}
+                    options={households.map((household) => ({
+                        value: household.id,
+                        label: household.name,
+                    }))}
+                    disabled={households.length === 1}
+                    onChange={(value) => {
+                        form.setData('household_id', value);
+                        form.setData('parent_id', null);
+                        form.clearErrors('household_id');
+                        form.clearErrors('parent_id');
+                    }}
+                />
+            </Form.Item>
+
             <Form.Item
                 label="Nazwa lokalizacji / pojemnika"
                 htmlFor="place-name"
@@ -48,8 +80,8 @@ export default function BasicInformationStep({
                     label="Strefa nadrzędna / Pomieszczenie"
                     htmlFor="place-parent"
                     required={!isRoom}
-                    validateStatus={form.errors.parentId ? 'error' : ''}
-                    help={form.errors.parentId}
+                    validateStatus={form.errors.parent_id ? 'error' : ''}
+                    help={form.errors.parent_id}
                     className="mb-0! min-w-0"
                 >
                     <Select
@@ -62,14 +94,22 @@ export default function BasicInformationStep({
                                 : 'Wybierz pomieszczenie'
                         }
                         options={roomOptions}
-                        value={form.data.parentId || undefined}
+                        value={form.data.parent_id || undefined}
                         disabled={isRoom}
                         onChange={(value) => {
-                            form.setData('parentId', value);
-                            form.clearErrors('parentId');
+                            form.setData('parent_id', value);
+                            form.clearErrors('parent_id');
                         }}
                         className="w-full"
                     />
+                    {!isRoom && roomOptions.length === 0 && (
+                        <Alert
+                            type="info"
+                            showIcon
+                            title="Najpierw utwórz pomieszczenie. Wybierz typ „Pomieszczenie / Strefa”, zapisz je, a potem dodaj pudełko lub regał."
+                            className="mt-3 border-0! bg-primary-soft! text-primary! [&_.ant-alert-icon]:text-primary! [&_.ant-alert-title]:text-primary!"
+                        />
+                    )}
                 </Form.Item>
 
                 <Form.Item
@@ -82,6 +122,8 @@ export default function BasicInformationStep({
                         </span>
                     }
                     htmlFor="place-placement"
+                    validateStatus={form.errors.placement ? 'error' : ''}
+                    help={form.errors.placement}
                     className="mb-0! min-w-0 [&_.ant-form-item-label>label]:w-full"
                 >
                     <Input
@@ -91,9 +133,10 @@ export default function BasicInformationStep({
                         prefix={<AppstoreOutlined />}
                         placeholder="np. Regał metalowy #02, półka środkowa"
                         value={form.data.placement}
-                        onChange={(event) =>
-                            form.setData('placement', event.target.value)
-                        }
+                        onChange={(event) => {
+                            form.setData('placement', event.target.value);
+                            form.clearErrors('placement');
+                        }}
                         className="bg-tertiary!"
                     />
                 </Form.Item>

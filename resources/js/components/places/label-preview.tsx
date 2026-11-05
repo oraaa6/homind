@@ -31,16 +31,20 @@ export default function LabelPreview({
                     </span>
                 </div>
                 <div className="flex flex-wrap items-center gap-3 py-4">
-                    <QRCode
-                        type="svg"
-                        value={value ?? identifier}
-                        size={88}
-                        bordered={false}
-                        color="var(--text-primary)"
-                        bgColor="var(--white)"
-                        className="shrink-0"
-                    />
-                    <div className="min-w-0 flex-1 basis-32 wrap-anywhere">
+                    <div data-place-label-qr className="shrink-0">
+                        <QRCode
+                            type="svg"
+                            value={value ?? identifier}
+                            size={88}
+                            bordered={false}
+                            color="#1b1c1a"
+                            bgColor="#fff"
+                            className="shrink-0"
+                        />
+                    </div>
+                    <div
+                        className="min-w-0 flex-1 basis-32 wrap-anywhere"
+                    >
                         <p className="font-mono text-xl font-bold sm:text-2xl">
                             #{identifier}
                         </p>
@@ -56,7 +60,6 @@ export default function LabelPreview({
                 </div>
                 <div className="flex flex-wrap justify-between gap-2 border-t border-border pt-3 font-mono text-[0.625rem] text-(--button-text)">
                     <span>FORMAT: STANDARD 50x30mm</span>
-                    <span>AUTOGEN</span>
                 </div>
             </div>
         </div>

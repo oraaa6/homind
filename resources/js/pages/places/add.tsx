@@ -1,33 +1,17 @@
-import { CheckOutlined, PrinterOutlined } from '@ant-design/icons';
+import { CheckOutlined, QrcodeOutlined } from '@ant-design/icons';
 import type { FormDataErrors } from '@inertiajs/core';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { Form, message } from 'antd';
 import Button from '@/components/Button';
 import Heading from '@/components/heading';
-import { placeKinds } from '@/components/places/place-kinds';
+import type { RoomOption } from '@/components/places-steps/basic-information';
 import BasicInformationStep from '@/components/places-steps/basic-information';
-import IdentifierStep from '@/components/places-steps/identifier';
 import TypeStep from '@/components/places-steps/type';
 import SectionCard from '@/components/section-card';
 import { useFormValidation } from '@/hooks/use-form-validation';
 import { places } from '@/routes';
-import { add as addPlace } from '@/routes/places';
-import type { Place } from './data';
-import { mockPlaces } from './data';
+import { add as addPlace, store as storePlace } from '@/routes/places';
 import type { PlaceFormData } from './form-types';
-
-function nextIdentifier(kind: Place['kind'], current = '') {
-    const prefix = placeKinds[kind].prefix;
-    const indices = mockPlaces
-        .filter((place) => place.kind === kind)
-        .map((place) => Number(place.id.split('-')[1]));
-    const currentIndex = current.startsWith(`${prefix}-`)
-        ? Number(current.split('-')[1])
-        : 0;
-    const nextIndex = Math.max(0, currentIndex, ...indices) + 1;
-
-    return `${prefix}-${String(nextIndex).padStart(3, '0')}`;
-}
 
 function validatePlace(data: PlaceFormData): FormDataErrors<PlaceFormData> {
     const errors: FormDataErrors<PlaceFormData> = {};
@@ -36,22 +20,38 @@ function validatePlace(data: PlaceFormData): FormDataErrors<PlaceFormData> {
         errors.name = 'Podaj nazwę lokalizacji lub pojemnika.';
     }
 
-    if (data.kind !== 'room' && !data.parentId) {
-        errors.parentId = 'Wybierz strefę nadrzędną lub pomieszczenie.';
+    if (!data.household_id) {
+        errors.household_id = 'Wybierz dom.';
+    }
+
+    if (data.kind !== 'room' && !data.parent_id) {
+        errors.parent_id = 'Wybierz strefę nadrzędną lub pomieszczenie.';
     }
 
     return errors;
 }
 
-export default function AddPlace() {
+type HouseholdOption = { id: number; name: string };
+export default function AddPlace({
+    households,
+    rooms,
+}: {
+    households: HouseholdOption[];
+    rooms: RoomOption[];
+}) {
     const form = useForm<PlaceFormData>({
-        kind: 'box',
+        household_id: households[0]?.id ?? 0,
+        kind: 'room',
         name: '',
-        parentId: '',
+        parent_id: null,
         placement: '',
-        identifier: nextIdentifier('box'),
     });
     const validate = useFormValidation(form, validatePlace);
+    const submit = () => {
+        if (!form.processing && validate()) {
+            form.post(storePlace().url);
+        }
+    };
 
     return (
         <>
@@ -68,15 +68,7 @@ export default function AddPlace() {
             <Form
                 layout="vertical"
                 noValidate
-                onFinish={() => {
-                    if (!validate()) {
-                        return;
-                    }
-
-                    message.info(
-                        'Zapis lokalizacji będzie dostępny po podłączeniu backendu.',
-                    );
-                }}
+                onFinish={submit}
                 className="space-y-5 sm:space-y-7"
             >
                 <TypeStep
@@ -85,26 +77,17 @@ export default function AddPlace() {
                         form.setData({
                             ...form.data,
                             kind,
-                            parentId: kind === 'room' ? '' : form.data.parentId,
-                            identifier: nextIdentifier(kind),
+                            parent_id:
+                                kind === 'room' ? null : form.data.parent_id,
                         });
-                        form.clearErrors('parentId');
+                        form.clearErrors('parent_id');
                     }}
                 />
 
-                <BasicInformationStep form={form} />
-
-                <IdentifierStep
+                <BasicInformationStep
                     form={form}
-                    onRegenerate={() =>
-                        form.setData(
-                            'identifier',
-                            nextIdentifier(
-                                form.data.kind,
-                                form.data.identifier,
-                            ),
-                        )
-                    }
+                    households={households}
+                    rooms={rooms}
                 />
 
                 <SectionCard
@@ -121,6 +104,7 @@ export default function AddPlace() {
                         <Button
                             type="ghost"
                             size="small"
+                            disabled={form.processing}
                             onClick={() =>
                                 message.info(
                                     'Zapisywanie wersji roboczej będzie dostępne po podłączeniu backendu.',
@@ -132,23 +116,17 @@ export default function AddPlace() {
                         <Button
                             type="secondary"
                             size="small"
-                            icon={<PrinterOutlined />}
-                            onClick={() => {
-                                if (!validate()) {
-                                    return;
-                                }
-
-                                message.info(
-                                    'Zapis lokalizacji i pobieranie etykiety PDF będą dostępne po podłączeniu backendu.',
-                                );
-                            }}
+                            icon={<QrcodeOutlined />}
+                            disabled={form.processing}
+                            onClick={submit}
                         >
-                            Zapisz i pobierz etykietę PDF
+                            Zapisz i pokaż etykietę QR
                         </Button>
                         <Button
                             type="primary"
                             size="small"
                             htmlType="submit"
+                            loading={form.processing}
                             icon={<CheckOutlined />}
                         >
                             Zapisz lokalizację

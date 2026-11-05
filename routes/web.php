@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\HouseholdController;
+use App\Http\Controllers\PlaceController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -19,11 +20,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         'element' => $element,
     ]))->name('things.show');
 
-    Route::inertia('places', 'places/index')->name('places');
-    Route::inertia('places/add', 'places/add')->name('places.add');
-    Route::get('places/{element}', fn (string $element) => Inertia::render('places/show', [
-        'element' => $element,
-    ]))->name('places.show');
+    Route::get('places', [PlaceController::class, 'index'])->name('places');
+    Route::get('places/add', [PlaceController::class, 'create'])->name('places.add');
+    Route::post('places', [PlaceController::class, 'store'])->name('places.store');
+    Route::get('places/{element}', [PlaceController::class, 'show'])->name('places.show');
 });
 
 require __DIR__ . '/settings.php';

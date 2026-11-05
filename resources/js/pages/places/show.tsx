@@ -1,58 +1,36 @@
-import {
-    EnvironmentOutlined,
-    PlusOutlined,
-    PrinterOutlined,
-} from '@ant-design/icons';
-import { Head, router } from '@inertiajs/react';
-import { message } from 'antd';
-import Button from '@/components/Button';
 import Heading from '@/components/heading';
 import PlaceActivityCard from '@/components/places/activity';
 import PlaceContents from '@/components/places/contents';
 import PlaceLabelCard from '@/components/places/label-card';
 import { placeKinds } from '@/components/places/place-kinds';
 import Statistics from '@/components/statistics';
+import type { Thing } from '@/pages/things/data';
 import { places } from '@/routes';
 import { show as showPlace } from '@/routes/places';
 import { add as addThing } from '@/routes/things';
-import { getPlaceThings, mockPlaceDetails, mockPlaces } from './data';
+import { EnvironmentOutlined, PlusOutlined } from '@ant-design/icons';
+import { Head, router } from '@inertiajs/react';
+import { message } from 'antd';
+import type { Place, PlaceActivity } from './data';
 
-export default function ShowPlace({ element }: { element: string }) {
-    const place = mockPlaces.find((item) => item.slug === element);
+export default function ShowPlace({
+    place,
+    parentName,
+    placePath,
+}: {
+    place: Place;
+    parentName?: string | null;
+    placePath?: string;
+}) {
+    const items: Thing[] = [];
+    const history: PlaceActivity[] = [];
+    const room = parentName ?? place.name;
 
-    if (!place) {
-        return (
-            <>
-                <Head title="Nie znaleziono lokalizacji" />
-                <Heading
-                    title="Nie znaleziono lokalizacji"
-                    backLink={{
-                        href: places().url,
-                        label: 'Wróć do listy lokalizacji',
-                    }}
-                />
-            </>
-        );
-    }
-
-    const parent = mockPlaces.find((item) => item.id === place.parentId);
-    const items = getPlaceThings(place.id);
-    const details = mockPlaceDetails[place.id];
-    const lastScan = details?.lastScan;
-    const room = parent?.name ?? place.name;
-    const path = showPlace(place.slug).url;
+    const path = placePath ?? showPlace(place.slug).url;
     const url =
         typeof window === 'undefined'
             ? path
             : new URL(path, window.location.origin).href;
-    const history = details?.history ?? [
-        {
-            title: `Utworzono lokalizację: ${place.name}`,
-            date: `${place.createdAt}T09:00:00`,
-            author: 'System',
-            type: 'created' as const,
-        },
-    ];
 
     return (
         <>
@@ -64,20 +42,6 @@ export default function ShowPlace({ element }: { element: string }) {
                     href: places().url,
                     label: 'Wróć do listy lokalizacji',
                 }}
-                actions={
-                    <Button
-                        type="secondary"
-                        size="small"
-                        icon={<PrinterOutlined />}
-                        onClick={() =>
-                            message.info(
-                                'Drukowanie etykiety będzie dostępne po podłączeniu backendu.',
-                            )
-                        }
-                    >
-                        Drukuj etykietę QR
-                    </Button>
-                }
                 secondaryButtonProps={
                     place.kind !== 'room'
                         ? {
@@ -110,22 +74,14 @@ export default function ShowPlace({ element }: { element: string }) {
                             label: 'Lokalizacja',
                             value: room,
                             icon: '/icons/zone.svg',
-                            description: parent?.levelLabel ?? place.levelLabel,
+                            description: place.levelLabel,
                         },
                         {
                             label: 'Ostatni skan',
-                            value: lastScan
-                                ? new Intl.DateTimeFormat('pl-PL', {
-                                      day: '2-digit',
-                                      month: '2-digit',
-                                      hour: '2-digit',
-                                      minute: '2-digit',
-                                  }).format(new Date(lastScan.date))
-                                : 'Brak skanów',
+                            value: 'Brak skanów',
                             icon: '/icons/qr-box.svg',
-                            description: lastScan
-                                ? `Zeskanowane przez ${lastScan.author}`
-                                : 'Ta lokalizacja nie była jeszcze skanowana',
+                            description:
+                                'Ta lokalizacja nie była jeszcze skanowana',
                         },
                     ]}
                 />
@@ -138,7 +94,7 @@ export default function ShowPlace({ element }: { element: string }) {
                     <div className="flex min-w-0 flex-col gap-5 lg:gap-7">
                         <PlaceLabelCard
                             place={place}
-                            room={parent?.name}
+                            room={parentName ?? undefined}
                             url={url}
                         />
                         <PlaceActivityCard history={history} />

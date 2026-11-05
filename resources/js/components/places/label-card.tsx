@@ -1,11 +1,12 @@
 import {
-    DownloadOutlined,
+    PrinterOutlined,
     ReloadOutlined,
     ShareAltOutlined,
 } from '@ant-design/icons';
 import { message } from 'antd';
 import Button from '@/components/Button';
 import SectionCard from '@/components/section-card';
+import { usePrintPlaceLabel } from '@/hooks/use-print-place-label';
 import type { Place } from '@/pages/places/data';
 import LabelPreview from './label-preview';
 
@@ -18,6 +19,8 @@ export default function PlaceLabelCard({
     room?: string;
     url: string;
 }) {
+    const printLabel = usePrintPlaceLabel(place.id, place.name);
+
     return (
         <SectionCard
             as="aside"
@@ -39,15 +42,11 @@ export default function PlaceLabelCard({
                 <Button
                     type="primary"
                     size="small"
-                    icon={<DownloadOutlined />}
+                    icon={<PrinterOutlined />}
                     className="h-auto! min-h-9 py-2! whitespace-normal!"
-                    onClick={() =>
-                        message.info(
-                            'Pobieranie etykiety PDF będzie dostępne po podłączeniu backendu.',
-                        )
-                    }
+                    onClick={printLabel}
                 >
-                    Pobierz etykietę PDF (50×30 mm)
+                    Drukuj etykietę (50×30 mm)
                 </Button>
                 <div className="grid grid-cols-2 gap-2">
                     <Button
@@ -61,7 +60,7 @@ export default function PlaceLabelCard({
                             )
                         }
                     >
-                        Generuj nowy kod
+                        Nowy kod
                     </Button>
                     <Button
                         type="secondary"
