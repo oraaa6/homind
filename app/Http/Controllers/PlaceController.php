@@ -97,7 +97,7 @@ class PlaceController extends Controller
                 'name' => $place->name,
                 'kind' => $place->kind,
                 'parentId' => $parent?->identifier,
-                'qrCode' => $place->identifier,
+                'qrCode' => $place->kind === 'room' ? null : $place->identifier,
                 'level' => $level ?? '',
                 'levelLabel' => $levelLabel,
                 'description' => $place->placement ?? '',
@@ -125,7 +125,7 @@ class PlaceController extends Controller
             'kind' => $place->kind,
             'parentId' => $parent?->identifier,
             'parentName' => $parent?->name,
-            'qrCode' => $place->identifier,
+            'qrCode' => $place->kind === 'room' ? null : $place->identifier,
             'level' => $level ?? '',
             'levelLabel' => match ($level) {
                 'ground' => 'Parter',

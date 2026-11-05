@@ -22,7 +22,7 @@
 
 @media (max-width: 39.999rem) {
     .mobileSider :global(.ant-layout-sider-zero-width-trigger) {
-        top: 1rem;
+        top: 0.25rem;
     }
 }
 

@@ -46,15 +46,15 @@ export default function Places({ places: placesData }: { places: Place[] }) {
         return {
             id: place.id,
             title: place.name,
-            description: (
+            description: place.parentName ? (
                 <>
                     <EnvironmentOutlined
                         className="mt-0.5 shrink-0"
                         aria-hidden="true"
                     />
-                    {place.parentName ?? 'Bez pomieszczenia nadrzędnego'}
+                    {place.parentName}
                 </>
-            ),
+            ) : undefined,
             value: (
                 <span className="text-sm whitespace-nowrap sm:text-base">
                     Przedmioty: 0
@@ -85,12 +85,12 @@ export default function Places({ places: placesData }: { places: Place[] }) {
             description: 'Pomieszczenia i otoczenie domu',
         },
         {
-            label: 'Pudełka z kodem QR',
+            label: 'Obiekty z kodem QR',
             value: String(
-                placesData.filter((place) => place.kind === 'box' && place.qrCode).length,
+                placesData.filter((place) => place.kind !== 'room' && place.qrCode).length,
             ),
             icon: '/icons/qr-box.svg',
-            description: 'Oznaczone pojemniki',
+            description: 'Oznaczone regały i pojemniki',
         },
         {
             label: 'Skatalogowane rzeczy',

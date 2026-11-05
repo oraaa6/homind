@@ -30,12 +30,11 @@ class Place extends Model
     protected static function booted(): void
     {
         static::created(function (self $place): void {
-            if ($place->identifier !== null) {
+            if ($place->identifier !== null || $place->kind === 'room') {
                 return;
             }
 
             $prefix = match ($place->kind) {
-                'room' => 'LOC',
                 'rack' => 'RACK',
                 'box' => 'BOX',
                 default => strtoupper($place->kind),

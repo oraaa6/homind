@@ -1,3 +1,6 @@
+import { EnvironmentOutlined, PlusOutlined } from '@ant-design/icons';
+import { Head, router } from '@inertiajs/react';
+import { message } from 'antd';
 import Heading from '@/components/heading';
 import PlaceActivityCard from '@/components/places/activity';
 import PlaceContents from '@/components/places/contents';
@@ -8,9 +11,6 @@ import type { Thing } from '@/pages/things/data';
 import { places } from '@/routes';
 import { show as showPlace } from '@/routes/places';
 import { add as addThing } from '@/routes/things';
-import { EnvironmentOutlined, PlusOutlined } from '@ant-design/icons';
-import { Head, router } from '@inertiajs/react';
-import { message } from 'antd';
 import type { Place, PlaceActivity } from './data';
 
 export default function ShowPlace({
@@ -25,6 +25,31 @@ export default function ShowPlace({
     const items: Thing[] = [];
     const history: PlaceActivity[] = [];
     const room = parentName ?? place.name;
+    const statistics = [
+        {
+            label: 'Zawartość',
+            value: `${items.length} przedmiotów`,
+            icon: '/icons/catalog.svg',
+            description: 'Wszystkie skatalogowane',
+        },
+        {
+            label: 'Lokalizacja',
+            value: room,
+            icon: '/icons/zone.svg',
+            description: place.levelLabel,
+        },
+        ...(place.kind !== 'room'
+            ? [
+                  {
+                      label: 'Ostatni skan',
+                      value: 'Brak skanów',
+                      icon: '/icons/qr-box.svg',
+                      description:
+                          'Ta lokalizacja nie była jeszcze skanowana',
+                  },
+              ]
+            : []),
+    ];
 
     const path = placePath ?? showPlace(place.slug).url;
     const url =
@@ -37,7 +62,7 @@ export default function ShowPlace({
             <Head title={place.name} />
             <Heading
                 title={place.name}
-                description={`#${place.id} · ${placeKinds[place.kind].label} · ${room}`}
+                description={`${place.qrCode ? `#${place.id} · ` : ''}${placeKinds[place.kind].label} · ${room}`}
                 backLink={{
                     href: places().url,
                     label: 'Wróć do listy lokalizacji',
@@ -63,27 +88,7 @@ export default function ShowPlace({
             <div className="flex min-w-0 flex-col gap-5 sm:gap-7">
                 <Statistics
                     valueClassName="text-xl! whitespace-normal sm:text-2xl!"
-                    items={[
-                        {
-                            label: 'Zawartość',
-                            value: `${items.length} przedmiotów`,
-                            icon: '/icons/catalog.svg',
-                            description: 'Wszystkie skatalogowane',
-                        },
-                        {
-                            label: 'Lokalizacja',
-                            value: room,
-                            icon: '/icons/zone.svg',
-                            description: place.levelLabel,
-                        },
-                        {
-                            label: 'Ostatni skan',
-                            value: 'Brak skanów',
-                            icon: '/icons/qr-box.svg',
-                            description:
-                                'Ta lokalizacja nie była jeszcze skanowana',
-                        },
-                    ]}
+                    items={statistics}
                 />
                 <div className="grid items-start gap-5 lg:gap-7 xl:grid-cols-[minmax(0,2fr)_minmax(300px,1fr)]">
                     <PlaceContents
@@ -92,11 +97,13 @@ export default function ShowPlace({
                         kind={place.kind}
                     />
                     <div className="flex min-w-0 flex-col gap-5 lg:gap-7">
-                        <PlaceLabelCard
-                            place={place}
-                            room={parentName ?? undefined}
-                            url={url}
-                        />
+                        {place.qrCode && (
+                            <PlaceLabelCard
+                                place={place}
+                                room={parentName ?? undefined}
+                                url={url}
+                            />
+                        )}
                         <PlaceActivityCard history={history} />
                     </div>
                 </div>
