@@ -3,13 +3,14 @@ export type Place = {
     slug: string;
     name: string;
     kind: 'room' | 'box' | 'rack';
-    parentId: string | null;
+    parentId: number | null;
     parentName?: string | null;
     qrCode: string | null;
     level: string;
     levelLabel: string;
     description: string;
     createdAt: string;
+    thingCount: number;
 };
 
 export type PlaceActivity = {

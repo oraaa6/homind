@@ -13,17 +13,19 @@ export type ItemsTableRow = ComponentProps<typeof DataTableItem> & {
 
 type ItemsTableProps = Omit<
     TableProps<ItemsTableRow>,
-    'columns' | 'dataSource' | 'rowKey'
+    'columns' | 'dataSource' | 'rowKey' | 'variant'
 > & {
     items: ItemsTableRow[];
     valueColumnWidth?: number;
     actionsColumnWidth?: number;
+    variant?: 'default' | 'muted';
 };
 
 export default function ItemsTable({
     items,
     valueColumnWidth = 112,
     actionsColumnWidth = 128,
+    variant = 'default',
     ...props
 }: ItemsTableProps) {
     const isMobile = !Grid.useBreakpoint().xl;
@@ -107,5 +109,12 @@ export default function ItemsTable({
         });
     }
 
-    return <DataTable columns={columns} dataSource={items} {...props} />;
+    return (
+        <DataTable
+            columns={columns}
+            dataSource={items}
+            variant={variant}
+            {...props}
+        />
+    );
 }

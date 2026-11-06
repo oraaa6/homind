@@ -1,34 +1,45 @@
-import { EnvironmentOutlined, PlusOutlined } from '@ant-design/icons';
-import { Head, router } from '@inertiajs/react';
-import { message } from 'antd';
+import Button from '@/components/Button';
 import Heading from '@/components/heading';
 import PlaceActivityCard from '@/components/places/activity';
+import ChangePlaceLocationModal from '@/components/places/change-location-modal';
 import PlaceContents from '@/components/places/contents';
 import PlaceLabelCard from '@/components/places/label-card';
 import { placeKinds } from '@/components/places/place-kinds';
 import Statistics from '@/components/statistics';
 import type { Thing } from '@/pages/things/data';
 import { places } from '@/routes';
-import { show as showPlace } from '@/routes/places';
+import { destroy as destroyPlace, show as showPlace } from '@/routes/places';
 import { add as addThing } from '@/routes/things';
+import {
+    DeleteOutlined,
+    EnvironmentOutlined,
+    PlusOutlined,
+} from '@ant-design/icons';
+import { Head, router } from '@inertiajs/react';
+import { message, Popconfirm } from 'antd';
+import { useState } from 'react';
 import type { Place, PlaceActivity } from './data';
 
 export default function ShowPlace({
     place,
+    things,
     parentName,
     placePath,
+    rooms,
 }: {
     place: Place;
+    things: Thing[];
     parentName?: string | null;
     placePath?: string;
+    rooms: { id: number; name: string }[];
 }) {
-    const items: Thing[] = [];
+    const [locationModalOpen, setLocationModalOpen] = useState(false);
     const history: PlaceActivity[] = [];
     const room = parentName ?? place.name;
     const statistics = [
         {
             label: 'Zawartość',
-            value: `${items.length} przedmiotów`,
+            value: `${things.length} przedmiotów`,
             icon: '/icons/catalog.svg',
             description: 'Wszystkie skatalogowane',
         },
@@ -44,8 +55,7 @@ export default function ShowPlace({
                       label: 'Ostatni skan',
                       value: 'Brak skanów',
                       icon: '/icons/qr-box.svg',
-                      description:
-                          'Ta lokalizacja nie była jeszcze skanowana',
+                      description: 'Ta lokalizacja nie była jeszcze skanowana',
                   },
               ]
             : []),
@@ -67,15 +77,43 @@ export default function ShowPlace({
                     href: places().url,
                     label: 'Wróć do listy lokalizacji',
                 }}
+                actions={
+                    <Popconfirm
+                        title="Usunąć lokalizację na stałe?"
+                        description="Można usunąć tylko pustą lokalizację. Najpierw przenieś lub usuń jej zawartość i lokalizacje podrzędne."
+                        okText="Usuń na stałe"
+                        cancelText="Anuluj"
+                        okButtonProps={{ type: 'primary' }}
+                        cancelButtonProps={{ type: 'text' }}
+                        onConfirm={() => {
+                            router.delete(destroyPlace(place.slug).url, {
+                                onSuccess: () =>
+                                    message.success(
+                                        'Lokalizacja została usunięta.',
+                                    ),
+                                onError: (errors) =>
+                                    message.error(
+                                        errors.place ??
+                                            'Nie udało się usunąć lokalizacji.',
+                                    ),
+                            });
+                        }}
+                    >
+                        <Button
+                            type="secondary"
+                            size="small"
+                            icon={<DeleteOutlined />}
+                        >
+                            Usuń lokalizację
+                        </Button>
+                    </Popconfirm>
+                }
                 secondaryButtonProps={
                     place.kind !== 'room'
                         ? {
                               children: 'Zmień lokalizację',
                               icon: <EnvironmentOutlined />,
-                              onClick: () =>
-                                  message.info(
-                                      'Zmiana lokalizacji będzie dostępna po podłączeniu backendu.',
-                                  ),
+                              onClick: () => setLocationModalOpen(true),
                           }
                         : undefined
                 }
@@ -90,24 +128,32 @@ export default function ShowPlace({
                     valueClassName="text-xl! whitespace-normal sm:text-2xl!"
                     items={statistics}
                 />
-                <div className="grid items-start gap-5 lg:gap-7 xl:grid-cols-[minmax(0,2fr)_minmax(300px,1fr)]">
-                    <PlaceContents
-                        key={place.id}
-                        items={items}
-                        kind={place.kind}
-                    />
-                    <div className="flex min-w-0 flex-col gap-5 lg:gap-7">
-                        {place.qrCode && (
+                <div className="flex min-w-0 flex-col gap-5 lg:gap-7">
+                    {place.kind !== 'room' && place.qrCode && (
+                        <div className="w-full min-w-0">
                             <PlaceLabelCard
                                 place={place}
                                 room={parentName ?? undefined}
                                 url={url}
                             />
-                        )}
-                        <PlaceActivityCard history={history} />
-                    </div>
+                        </div>
+                    )}
+                    <PlaceContents
+                        key={place.id}
+                        items={things}
+                        kind={place.kind}
+                    />
                 </div>
+                <PlaceActivityCard history={history} />
             </div>
+            {locationModalOpen && (
+                <ChangePlaceLocationModal
+                    place={place}
+                    parentName={parentName ?? null}
+                    rooms={rooms}
+                    onClose={() => setLocationModalOpen(false)}
+                />
+            )}
         </>
     );
 }

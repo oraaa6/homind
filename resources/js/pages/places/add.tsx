@@ -102,27 +102,6 @@ export default function AddPlace({
                     </Link>
                     <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
                         <Button
-                            type="ghost"
-                            size="small"
-                            disabled={form.processing}
-                            onClick={() =>
-                                message.info(
-                                    'Zapisywanie wersji roboczej będzie dostępne po podłączeniu backendu.',
-                                )
-                            }
-                        >
-                            Zapisz jako wersję roboczą
-                        </Button>
-                        <Button
-                            type="secondary"
-                            size="small"
-                            icon={<QrcodeOutlined />}
-                            disabled={form.processing}
-                            onClick={submit}
-                        >
-                            Zapisz i pokaż etykietę QR
-                        </Button>
-                        <Button
                             type="primary"
                             size="small"
                             htmlType="submit"

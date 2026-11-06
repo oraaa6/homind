@@ -17,14 +17,14 @@
 }
 
 .mobileSider :global(.ant-layout-sider-zero-width-trigger) {
-    top: 5rem;
+    top: 0.25rem;
 }
 
-@media (max-width: 39.999rem) {
+/* @media (max-width: 39.999rem) {
     .mobileSider :global(.ant-layout-sider-zero-width-trigger) {
         top: 0.25rem;
     }
-}
+} */
 
 .mobileSiderCollapsed {
     width: 0;

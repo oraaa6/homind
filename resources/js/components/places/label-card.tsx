@@ -1,4 +1,5 @@
 import {
+    QrcodeOutlined,
     PrinterOutlined,
     ReloadOutlined,
     ShareAltOutlined,
@@ -26,62 +27,77 @@ export default function PlaceLabelCard({
             as="aside"
             title="Fizyczny tag QR"
             description="Etykieta samoprzylepna"
-            className="min-w-0"
+            className="w-full min-w-0"
         >
-            <LabelPreview
-                identifier={place.qrCode ?? place.id}
-                name={place.name}
-                room={room}
-                kind={place.kind}
-                value={url}
-            />
-            <p className="mt-3 text-xs text-(--button-text)">
-                Skan aparatem otwiera bezpośredni podgląd zawartości w Homind.
-            </p>
-            <div className="mt-5 flex flex-col gap-2">
-                <Button
-                    type="primary"
-                    size="small"
-                    icon={<PrinterOutlined />}
-                    className="h-auto! min-h-9 py-2! whitespace-normal!"
-                    onClick={printLabel}
-                >
-                    Drukuj etykietę (50×30 mm)
-                </Button>
-                <div className="grid grid-cols-2 gap-2">
+            <div className="grid min-w-0 gap-5 lg:grid-cols-[minmax(0,1.2fr)_minmax(18rem,0.8fr)] lg:items-center lg:gap-8">
+                <div className="min-w-0">
+                    <LabelPreview
+                        identifier={place.qrCode ?? place.id}
+                        name={place.name}
+                        room={room}
+                        kind={place.kind}
+                        value={url}
+                    />
+                </div>
+                <div className="flex min-w-0 flex-col gap-5 rounded-2xl bg-tertiary p-4 sm:p-6">
+                    <div className="flex items-start gap-3">
+                        <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-surface-muted text-lg text-primary">
+                            <QrcodeOutlined aria-hidden="true" />
+                        </span>
+                        <div>
+                            <h4 className="font-semibold text-foreground">
+                                Gotowa do wydruku
+                            </h4>
+                            <p className="mt-1 text-sm text-(--button-text)">
+                                Zeskanowanie etykiety aparatem otwiera tę
+                                lokalizację w Homind.
+                            </p>
+                        </div>
+                    </div>
                     <Button
-                        type="secondary"
+                        type="primary"
                         size="small"
-                        icon={<ReloadOutlined />}
-                        className="h-auto! min-h-9 py-2! whitespace-normal!"
-                        onClick={() =>
-                            message.info(
-                                'Generowanie nowego kodu będzie dostępne po podłączeniu backendu.',
-                            )
-                        }
+                        icon={<PrinterOutlined />}
+                        className="h-auto! min-h-9 w-full! py-2! whitespace-normal!"
+                        onClick={printLabel}
                     >
-                        Nowy kod
+                        Drukuj etykietę (50×30 mm)
                     </Button>
-                    <Button
-                        type="secondary"
-                        size="small"
-                        icon={<ShareAltOutlined />}
-                        className="h-auto! min-h-9 py-2! whitespace-normal!"
-                        onClick={async () => {
-                            try {
-                                await navigator.clipboard.writeText(url);
-                                message.success(
-                                    'Skopiowano link do lokalizacji.',
-                                );
-                            } catch {
-                                message.error(
-                                    'Nie udało się skopiować linku. Skopiuj adres z paska przeglądarki.',
-                                );
+                    <div className="grid grid-cols-2 gap-2">
+                        <Button
+                            type="secondary"
+                            size="small"
+                            icon={<ReloadOutlined />}
+                            className="h-auto! min-h-9 py-2! whitespace-normal!"
+                            onClick={() =>
+                                message.info(
+                                    'Generowanie nowego kodu będzie dostępne po podłączeniu backendu.',
+                                )
                             }
-                        }}
-                    >
-                        Udostępnij
-                    </Button>
+                        >
+                            Nowy kod
+                        </Button>
+                        <Button
+                            type="secondary"
+                            size="small"
+                            icon={<ShareAltOutlined />}
+                            className="h-auto! min-h-9 py-2! whitespace-normal!"
+                            onClick={async () => {
+                                try {
+                                    await navigator.clipboard.writeText(url);
+                                    message.success(
+                                        'Skopiowano link do lokalizacji.',
+                                    );
+                                } catch {
+                                    message.error(
+                                        'Nie udało się skopiować linku. Skopiuj adres z paska przeglądarki.',
+                                    );
+                                }
+                            }}
+                        >
+                            Udostępnij
+                        </Button>
+                    </div>
                 </div>
             </div>
         </SectionCard>

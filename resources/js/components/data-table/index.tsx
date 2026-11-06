@@ -5,13 +5,18 @@ import styles from './styles.module.css';
 
 export { default as DataTableItem } from './item';
 
+type DataTableProps<T extends object> = TableProps<T> & {
+    variant?: 'default' | 'muted';
+};
+
 export default function DataTable<T extends object>({
     className,
     pagination,
     locale,
     showHeader = false,
+    variant = 'default',
     ...props
-}: TableProps<T>) {
+}: DataTableProps<T>) {
     return (
         <Table<T>
             rowKey="id"
@@ -19,6 +24,7 @@ export default function DataTable<T extends object>({
             className={clsx(
                 styles.table,
                 !showHeader && styles.cards,
+                variant === 'muted' && styles.muted,
                 className,
             )}
             locale={{ emptyText: 'Brak wyników', ...locale }}

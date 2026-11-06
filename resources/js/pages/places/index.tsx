@@ -17,7 +17,13 @@ const sortOptions = [
     { value: 'name', label: 'Nazwa A–Z' },
 ];
 
-export default function Places({ places: placesData }: { places: Place[] }) {
+export default function Places({
+    places: placesData,
+    totalThings,
+}: {
+    places: Place[];
+    totalThings: number;
+}) {
     const [filter, setFilter] = useState('all');
     const [searchInput, setSearchInput] = useState('');
     const [search, setSearch] = useState('');
@@ -46,18 +52,24 @@ export default function Places({ places: placesData }: { places: Place[] }) {
         return {
             id: place.id,
             title: place.name,
-            description: place.parentName ? (
+            description: place.parentName || place.description ? (
                 <>
                     <EnvironmentOutlined
                         className="mt-0.5 shrink-0"
                         aria-hidden="true"
                     />
-                    {place.parentName}
+                    <span className="flex min-w-0 flex-wrap items-center gap-x-1.5">
+                        {place.parentName && <span>{place.parentName}</span>}
+                        {place.parentName && place.description && (
+                            <span aria-hidden="true">·</span>
+                        )}
+                        {place.description && <span>{place.description}</span>}
+                    </span>
                 </>
             ) : undefined,
             value: (
                 <span className="text-sm whitespace-nowrap sm:text-base">
-                    Przedmioty: 0
+                    Przedmioty: {place.thingCount}
                 </span>
             ),
             status: (
@@ -94,7 +106,7 @@ export default function Places({ places: placesData }: { places: Place[] }) {
         },
         {
             label: 'Skatalogowane rzeczy',
-            value: '0',
+            value: String(totalThings),
             icon: '/icons/catalog.svg',
             description: 'Przypisane do stref',
         },

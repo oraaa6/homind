@@ -1,106 +1,291 @@
-import { Form, Input, Radio } from 'antd';
-import clsx from 'clsx';
+import { EnvironmentOutlined, QrcodeOutlined } from '@ant-design/icons';
+import { Scanner } from '@yudiel/react-qr-scanner';
+import { Alert, Checkbox, Form, Input, Modal, Select } from 'antd';
+import { useState } from 'react';
+import Button from '@/components/Button';
 import SectionCard from '@/components/section-card';
-import type { ThingFormState } from '@/pages/things/form-types';
+import type {
+    ThingFormState,
+    ThingPlaceOption,
+} from '@/pages/things/form-types';
 
-const rooms = [
-    {
-        value: 'kitchen',
-        label: 'Kuchnia',
-        subtitle: 'Poziom 0',
-    },
-    {
-        value: 'garage',
-        label: 'Garaż & Warsztat',
-        subtitle: 'Budynek zewn.',
-    },
-    {
-        value: 'living-room',
-        label: 'Salon',
-        subtitle: 'Poziom 0',
-    },
-    {
-        value: 'basement',
-        label: 'Piwnica',
-        subtitle: 'Poziom -1',
-    },
-    {
-        value: 'attic',
-        label: 'Strych',
-        subtitle: 'Poziom +2',
-    },
-    {
-        value: 'garden',
-        label: 'Ogród',
-        subtitle: 'Otoczenie',
-    },
-];
+function getPlaceIdFromQr(code: string): number | null {
+    try {
+        const pathname = new URL(code.trim(), 'https://homind.local').pathname;
+        const match = pathname.match(/\/places\/(\d+)\/?$/);
 
-export default function LocationStep({ form }: { form: ThingFormState }) {
+        return match ? Number(match[1]) : null;
+    } catch {
+        return null;
+    }
+}
+
+export default function LocationStep({
+    form,
+    places,
+}: {
+    form: ThingFormState;
+    places: ThingPlaceOption[];
+}) {
+    const [scannerOpen, setScannerOpen] = useState(false);
+    const [manualCode, setManualCode] = useState('');
+    const [scanError, setScanError] = useState('');
+    const placeOptions = places.map((place) => ({
+        value: place.id,
+        label: [
+            place.name,
+            place.parent_name,
+            place.household_name,
+        ]
+            .filter(Boolean)
+            .join(' · '),
+    }));
+    const selectedPlace = places.find(
+        (place) => String(place.id) === String(form.data.place_id),
+    );
+
+    const selectScannedPlace = (code: string) => {
+        const id = getPlaceIdFromQr(code);
+        const place = places.find((option) => option.id === id);
+
+        if (!place) {
+            setScanError(
+                'Kod nie wskazuje lokalizacji dostępnej w jednym z Twoich domów.',
+            );
+
+            return;
+        }
+
+        form.setData({
+            ...form.data,
+            place_id: place.id,
+            needs_packing:
+                place.kind === 'room' ? form.data.needs_packing : false,
+            placement:
+                place.kind !== 'room' && form.data.needs_packing
+                    ? ''
+                    : form.data.placement,
+        });
+        form.clearErrors('place_id');
+        setScannerOpen(false);
+        setManualCode('');
+        setScanError('');
+    };
+
     return (
-        <SectionCard
-            number="02"
-            title="Gdzie znajduje się przedmiot?"
-            description="Przypisz stałą strefę domową"
-            className="xl:p-9"
-        >
-            <Form.Item
-                label="Strefa główna / Pomieszczenie"
-                required
-                validateStatus={form.errors.room ? 'error' : ''}
-                help={form.errors.room}
+        <>
+            <SectionCard
+                number="02"
+                title="Gdzie znajduje się przedmiot?"
+                description="Wybierz pomieszczenie docelowe albo konkretne miejsce składowania."
+                className="xl:p-9"
             >
-                <Radio.Group
-                    value={form.data.room}
-                    onChange={(event) => {
-                        form.setData('room', event.target.value);
-                        form.clearErrors('room');
-                    }}
-                    className="grid! w-full grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3"
-                >
-                    {rooms.map((room) => {
-                        const selected = form.data.room === room.value;
-
-                        return (
-                            <Radio
-                                key={room.value}
-                                value={room.value}
-                                className={clsx(
-                                    'm-0! flex! min-h-24 min-w-0 items-center! justify-start! rounded-xl border border-transparent p-4! text-left! sm:p-5! [&_.ant-radio]:hidden',
-                                    selected
-                                        ? 'border-primary! bg-primary-soft! text-primary!'
-                                        : 'bg-tertiary text-foreground!',
-                                )}
+                {places.length === 0 ? (
+                    <Alert
+                        type="info"
+                        showIcon
+                        title="Najpierw dodaj lokalizację, w której będzie przechowywany przedmiot."
+                    />
+                ) : (
+                    <>
+                        <Form.Item
+                            label="Lokalizacja"
+                            required
+                            validateStatus={form.errors.place_id ? 'error' : ''}
+                            help={form.errors.place_id}
+                        >
+                            <div className="flex flex-col gap-3 sm:flex-row">
+                                <Select
+                                    showSearch
+                                    optionFilterProp="label"
+                                    size="large"
+                                    className="min-w-0 flex-1"
+                                    placeholder="Wybierz lokalizację"
+                                    options={placeOptions}
+                                    value={form.data.place_id ?? undefined}
+                                    onChange={(value) => {
+                                        const place = places.find(
+                                            (option) =>
+                                                String(option.id) ===
+                                                String(value),
+                                        );
+                                        form.setData({
+                                            ...form.data,
+                                            place_id: value,
+                                            needs_packing:
+                                                place?.kind !== 'room'
+                                                    ? false
+                                                    : form.data.needs_packing,
+                                            placement:
+                                                place?.kind !== 'room' &&
+                                                form.data.needs_packing
+                                                    ? ''
+                                                    : form.data.placement,
+                                        });
+                                        form.clearErrors('place_id');
+                                    }}
+                                />
+                                <Button
+                                    type="secondary"
+                                    size="small"
+                                    icon={<QrcodeOutlined />}
+                                    onClick={() => {
+                                        setScanError('');
+                                        setScannerOpen(true);
+                                    }}
+                                >
+                                    Skanuj kod QR
+                                </Button>
+                            </div>
+                        </Form.Item>
+                        <Form.Item
+                            validateStatus={
+                                form.errors.needs_packing ? 'error' : ''
+                            }
+                            help={form.errors.needs_packing}
+                            className="mt-5! mb-5!"
+                        >
+                            <Checkbox
+                                checked={form.data.needs_packing}
+                                disabled={selectedPlace?.kind !== 'room'}
+                                onChange={(event) => {
+                                    form.setData({
+                                        ...form.data,
+                                        needs_packing: event.target.checked,
+                                        placement: event.target.checked
+                                            ? ''
+                                            : form.data.placement,
+                                    });
+                                    form.clearErrors('needs_packing');
+                                }}
                             >
-                                <span className="flex flex-col items-start gap-1">
-                                    <span className="font-semibold sm:text-base">
-                                        {room.label}
-                                    </span>
-                                    <span className="text-xs text-(--button-text) sm:text-sm">
-                                        {room.subtitle}
-                                    </span>
-                                </span>
-                            </Radio>
-                        );
-                    })}
-                </Radio.Group>
-            </Form.Item>
-            <Form.Item
-                label="Dokładne umiejscowienie w strefie"
-                extra="Półka, regał lub szafka itp."
-                className="mb-0!"
+                                Dodaj do kolejki{' '}
+                                <strong>Do spakowania</strong>
+                            </Checkbox>
+                        </Form.Item>
+                        {selectedPlace && selectedPlace.kind !== 'room' && (
+                            <p className="-mt-3 mb-5 text-sm text-(--button-text)">
+                                „Do spakowania” można wybrać tylko dla
+                                przedmiotu przypisanego bezpośrednio do
+                                pomieszczenia.
+                            </p>
+                        )}
+                        {selectedPlace?.kind === 'room' &&
+                            !form.data.needs_packing && (
+                                <p className="-mt-3 mb-5 text-sm text-(--button-text)">
+                                    Bez zaznaczenia pomieszczenie będzie
+                                    docelową lokalizacją przedmiotu.
+                                </p>
+                            )}
+                        {form.data.needs_packing && (
+                            <Alert
+                                type="info"
+                                showIcon
+                                title="Pomieszczenie jest aktualnym miejscem przedmiotu. Szczegółowe położenie zostanie ustawione po spakowaniu."
+                                className="mb-5!"
+                            />
+                        )}
+                        {!form.data.needs_packing && (
+                            <Form.Item
+                                label="Położenie szczegółowe"
+                                validateStatus={
+                                    form.errors.placement ? 'error' : ''
+                                }
+                                help={form.errors.placement}
+                                extra="Np. półka środkowa lub szuflada z narzędziami."
+                                className="mb-0!"
+                            >
+                                <Input
+                                    size="large"
+                                    prefix={<EnvironmentOutlined />}
+                                    placeholder="Opisz dokładne położenie"
+                                    value={form.data.placement}
+                                    onChange={(event) => {
+                                        form.setData(
+                                            'placement',
+                                            event.target.value,
+                                        );
+                                        form.clearErrors('placement');
+                                    }}
+                                    className="bg-tertiary!"
+                                />
+                            </Form.Item>
+                        )}
+                    </>
+                )}
+            </SectionCard>
+
+            <Modal
+                title="Zeskanuj kod QR lokalizacji"
+                open={scannerOpen}
+                onCancel={() => {
+                    setScannerOpen(false);
+                    setManualCode('');
+                    setScanError('');
+                }}
+                centered
+                width={600}
+                footer={
+                    <Button
+                        type="secondary"
+                        htmlType="button"
+                        size="small"
+                        onClick={() => {
+                            setScannerOpen(false);
+                            setManualCode('');
+                            setScanError('');
+                        }}
+                    >
+                        Anuluj
+                    </Button>
+                }
             >
-                <Input
-                    name="placement"
-                    size="large"
-                    placeholder="np. Regał warsztatowy A, Półka 2"
-                    value={form.data.placement}
-                    onChange={(event) =>
-                        form.setData('placement', event.target.value)
-                    }
-                    className="bg-tertiary!"
-                />
-            </Form.Item>
-        </SectionCard>
+                <div className="relative overflow-hidden rounded-xl bg-secondary">
+                    {scannerOpen && (
+                        <Scanner
+                            formats={['qr_code']}
+                            constraints={{ facingMode: 'environment' }}
+                            components={{ finder: true, torch: false }}
+                            sound={false}
+                            onScan={(codes) => {
+                                if (codes[0]?.rawValue) {
+                                    selectScannedPlace(codes[0].rawValue);
+                                }
+                            }}
+                            onError={() =>
+                                setScanError(
+                                    'Nie udało się uruchomić aparatu. Możesz wkleić adres z kodu ręcznie.',
+                                )
+                            }
+                        />
+                    )}
+                    <p className="pointer-events-none absolute right-0 bottom-4 left-0 text-center text-sm font-medium text-(--white)">
+                        Skieruj aparat na etykietę lokalizacji
+                    </p>
+                </div>
+                {scanError && (
+                    <Alert type="error" title={scanError} className="mt-4!" />
+                )}
+                <div className="mt-5 flex gap-2">
+                    <Input
+                        size="large"
+                        value={manualCode}
+                        onChange={(event) => setManualCode(event.target.value)}
+                        onPressEnter={() => selectScannedPlace(manualCode)}
+                        placeholder="Wklej adres QR, np. /places/42"
+                        aria-label="Adres z kodu QR lokalizacji"
+                    />
+                    <Button
+                        type="primary"
+                        htmlType="button"
+                        size="small"
+                        disabled={!manualCode.trim()}
+                        onClick={() => selectScannedPlace(manualCode)}
+                    >
+                        Wybierz
+                    </Button>
+                </div>
+            </Modal>
+        </>
     );
 }

@@ -1,17 +1,23 @@
 import { CheckOutlined } from '@ant-design/icons';
 import type { FormDataErrors } from '@inertiajs/core';
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, useForm } from '@inertiajs/react';
 import { Form, message } from 'antd';
 import Button from '@/components/Button';
 import Heading from '@/components/heading';
 import SectionCard from '@/components/section-card';
 import BasicInformationStep from '@/components/things-steps/basic-information';
 import LocationStep from '@/components/things-steps/location';
-import StorageStep from '@/components/things-steps/storage';
 import { useFormValidation } from '@/hooks/use-form-validation';
 import { things } from '@/routes';
-import { add as addThing } from '@/routes/things';
-import type { ThingFormData } from './form-types';
+import {
+    add as addThing,
+    store as storeThing,
+} from '@/routes/things';
+import type {
+    ThingCategoryOption,
+    ThingFormData,
+    ThingPlaceOption,
+} from './form-types';
 
 function validateThing(data: ThingFormData): FormDataErrors<ThingFormData> {
     const errors: FormDataErrors<ThingFormData> = {};
@@ -20,35 +26,40 @@ function validateThing(data: ThingFormData): FormDataErrors<ThingFormData> {
         errors.name = 'Podaj nazwę przedmiotu.';
     }
 
-    if (!data.category) {
-        errors.category = 'Wybierz kategorię.';
+    if (!data.category_id) {
+        errors.category_id = 'Wybierz kategorię.';
     }
 
-    if (!data.room) {
-        errors.room = 'Wybierz pomieszczenie.';
+    if (data.quantity < 0) {
+        errors.quantity = 'Ilość nie może być ujemna.';
     }
 
-    if (!data.storage) {
-        errors.storage = 'Wybierz typ składowania.';
+    if (!data.unit.trim()) {
+        errors.unit = 'Wybierz jednostkę.';
     }
 
-    if (data.storage === 'container' && !data.assignBoxLater && !data.boxId) {
-        errors.boxId = 'Wybierz pudełko lub przypisz je później.';
+    if (!data.place_id) {
+        errors.place_id = 'Wybierz lokalizację.';
     }
 
     return errors;
 }
 
-export default function AddThing() {
+export default function AddThing({
+    categories,
+    places,
+}: {
+    categories: ThingCategoryOption[];
+    places: ThingPlaceOption[];
+}) {
     const form = useForm<ThingFormData>({
         name: '',
-        category: '',
-        serialNumber: '',
-        room: '',
+        category_id: null,
+        quantity: 1,
+        unit: 'sztuka',
         placement: '',
-        storage: '',
-        boxId: '',
-        assignBoxLater: false,
+        place_id: null,
+        needs_packing: false,
     });
     const validate = useFormValidation(form, validateThing);
 
@@ -62,7 +73,7 @@ export default function AddThing() {
                     href: things().url,
                     label: 'Wróć do listy przedmiotów',
                 }}
-                className="mb-8 sm:mb-10"
+                className="mb-8! sm:mb-10!"
             />
 
             <Form
@@ -73,43 +84,34 @@ export default function AddThing() {
                         return;
                     }
 
-                    message.info(
-                        'Zapis przedmiotu będzie dostępny po podłączeniu backendu.',
-                    );
+                    form.post(storeThing().url, {
+                        onSuccess: () =>
+                            message.success('Przedmiot został dodany.'),
+                    });
                 }}
                 className="space-y-5 sm:space-y-7"
             >
-                <BasicInformationStep form={form} />
+                <BasicInformationStep form={form} categories={categories} />
 
-                <LocationStep form={form} />
-
-                <StorageStep form={form} />
+                <LocationStep form={form} places={places} />
 
                 <SectionCard
                     as="div"
                     className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between xl:p-9"
                 >
-                    <Link
+                    <Button
                         href={things().url}
-                        className="px-2 py-2 text-sm font-medium text-(--button-text) hover:text-primary sm:text-base"
+                        type="text"
+                        size="small"
+                        className="px-2! py-2!"
                     >
                         Anuluj
-                    </Link>
+                    </Button>
                     <div className="flex flex-col gap-2 sm:flex-row">
-                        <Button
-                            type="ghost"
-                            size="small"
-                            onClick={() =>
-                                message.info(
-                                    'Zapisywanie wersji roboczej będzie dostępne po podłączeniu backendu.',
-                                )
-                            }
-                        >
-                            Zapisz jako wersję roboczą
-                        </Button>
                         <Button
                             type="primary"
                             size="small"
+                            loading={form.processing}
                             htmlType="submit"
                             icon={<CheckOutlined />}
                         >

@@ -1,4 +1,5 @@
 import { Carousel, Input, Select } from 'antd';
+import clsx from 'clsx';
 import { useRef } from 'react';
 import Button from '@/components/Button';
 
@@ -19,6 +20,7 @@ type FiltersProps = {
     sortOptions: { value: string; label: string }[];
     sort: string;
     onSortChange: (value: string) => void;
+    variant?: 'default' | 'muted';
 };
 
 export default function Filters({
@@ -32,11 +34,18 @@ export default function Filters({
     sortOptions,
     sort,
     onSortChange,
+    variant = 'default',
 }: FiltersProps) {
     const dragged = useRef(false);
+    const isMuted = variant === 'muted';
 
     return (
-        <div className="grid min-w-0 grid-cols-1 items-center gap-3 rounded-2xl bg-(--white) p-3 shadow-sm sm:grid-cols-[minmax(0,1fr)_auto] sm:rounded-[1.25rem] sm:p-4 xl:grid-cols-[minmax(0,1fr)_minmax(0,2fr)_auto] xl:gap-4">
+        <div
+            className={clsx(
+                'grid min-w-0 grid-cols-1 items-center gap-3 rounded-2xl p-3 shadow-sm sm:grid-cols-[minmax(0,1fr)_auto] sm:rounded-[1.25rem] sm:p-4 xl:grid-cols-[minmax(0,1fr)_minmax(0,2fr)_auto] xl:gap-4',
+                isMuted ? 'bg-tertiary' : 'bg-(--white)',
+            )}
+        >
             <Input.Search
                 aria-label={searchPlaceholder}
                 size="large"
@@ -44,7 +53,11 @@ export default function Filters({
                 onChange={(event) => onSearchChange(event.target.value)}
                 onSearch={onSearch}
                 placeholder={searchPlaceholder}
-                className="min-w-0"
+                className={clsx(
+                    'min-w-0',
+                    isMuted &&
+                        '[&_.ant-input-affix-wrapper]:bg-surface-muted! [&_.ant-input]:bg-transparent!',
+                )}
             />
 
             <div
@@ -86,7 +99,12 @@ export default function Filters({
                                 size="small"
                                 aria-pressed={value === option.value}
                                 onClick={() => onChange(option.value)}
-                                className="font-semibold!"
+                                className={clsx(
+                                    'font-semibold!',
+                                    isMuted &&
+                                        value !== option.value &&
+                                        'border-surface-muted! bg-surface-muted! hover:bg-surface-muted!',
+                                )}
                             >
                                 <span>
                                     {option.label}
@@ -102,7 +120,12 @@ export default function Filters({
                 </Carousel>
             </div>
 
-            <div className="order-2 flex h-10 items-center gap-2 rounded-xl bg-background px-3 text-xs text-(--button-text) focus-within:ring-2 focus-within:ring-primary/40 sm:h-11 sm:px-4 sm:text-sm xl:order-3">
+            <div
+                className={clsx(
+                    'order-2 flex h-10 items-center gap-2 rounded-xl px-3 text-xs text-(--button-text) focus-within:ring-2 focus-within:ring-primary/40 sm:h-11 sm:px-4 sm:text-sm xl:order-3',
+                    isMuted ? 'bg-surface-muted' : 'bg-background',
+                )}
+            >
                 <span>Sortuj:</span>
                 <Select
                     aria-label="Sortuj pozycje"

@@ -1,6 +1,6 @@
+import { EnvironmentOutlined } from '@ant-design/icons';
 import SectionCard from '@/components/section-card';
 import type { ThingDetails } from '@/pages/things/data';
-import { EnvironmentOutlined } from '@ant-design/icons';
 
 export default function LocationCard({ details }: { details: ThingDetails }) {
     return (
@@ -23,13 +23,22 @@ export default function LocationCard({ details }: { details: ThingDetails }) {
                     Ścieżka składowania
                 </p>
                 <p className="text-lg font-semibold text-foreground sm:text-2xl">
-                    {details.room}{' '}
-                    <span className="text-(--button-text)">›</span>{' '}
-                    <span className="text-primary">{details.place}</span>
+                    {details.room}
+                    {details.place && (
+                        <>
+                            {' '}
+                            <span className="text-(--button-text)">›</span>{' '}
+                            <span className="text-primary">
+                                {details.place}
+                            </span>
+                        </>
+                    )}
                 </p>
-                <p className="mt-4 text-sm text-(--button-text) sm:text-base">
-                    {details.placementNote}
-                </p>
+                {details.placementNote && (
+                    <p className="mt-4 text-sm text-(--button-text) sm:text-base">
+                        {details.placementNote}
+                    </p>
+                )}
             </div>
         </SectionCard>
     );

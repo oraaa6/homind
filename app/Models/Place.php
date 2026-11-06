@@ -23,6 +23,7 @@ use Illuminate\Support\Carbon;
  * @property-read Household $household
  * @property-read Place|null $parent
  * @property-read Collection<int, Place> $children
+ * @property-read Collection<int, Thing> $things
  */
 #[Fillable(['parent_id', 'kind', 'name', 'level', 'placement'])]
 class Place extends Model
@@ -78,5 +79,15 @@ class Place extends Model
     public function children(): HasMany
     {
         return $this->hasMany(self::class, 'parent_id');
+    }
+
+    /**
+     * Things currently stored at this place.
+     *
+     * @return HasMany<Thing, $this>
+     */
+    public function things(): HasMany
+    {
+        return $this->hasMany(Thing::class);
     }
 }

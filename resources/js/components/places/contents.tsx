@@ -1,22 +1,13 @@
-import { ExportOutlined, ToolOutlined } from '@ant-design/icons';
 import { router } from '@inertiajs/react';
-import { Input, message, Select, Tooltip } from 'antd';
+import { Tag } from 'antd';
 import { useState } from 'react';
 import Button from '@/components/Button';
+import Filters from '@/components/filters';
 import ItemsTable from '@/components/items-table';
 import SectionCard from '@/components/section-card';
 import type { Place } from '@/pages/places/data';
 import type { Thing } from '@/pages/things/data';
 import { show as showThing } from '@/routes/things';
-
-const categoryLabels: Record<string, string> = {
-    kitchen: 'Kuchnia',
-    'living-room': 'Salon',
-    garage: 'Garaż i warsztat',
-    bedroom: 'Sypialnia',
-    bathroom: 'Łazienka / Pralnia',
-    garden: 'Ogród',
-};
 
 const contentTitles = {
     box: 'Przedmioty w tym pudełku',
@@ -24,11 +15,11 @@ const contentTitles = {
     room: 'Przedmioty w tej lokalizacji',
 };
 
-const statusColors = {
-    danger: 'bg-todo-danger',
-    success: 'bg-primary',
-    neutral: 'bg-neutral',
-};
+const sortOptions = [
+    { value: 'newest', label: 'Najnowsze' },
+    { value: 'oldest', label: 'Najstarsze' },
+    { value: 'name', label: 'Nazwa A–Z' },
+];
 
 export default function PlaceContents({
     items,
@@ -47,7 +38,7 @@ export default function PlaceContents({
         .filter(
             (item) =>
                 (category === 'all' || item.category === category) &&
-                `${item.name} ${item.id}`
+                `${item.name} ${item.id} ${item.category} ${item.storagePlaceName ?? ''}`
                     .toLocaleLowerCase('pl')
                     .includes(query),
         )
@@ -60,6 +51,17 @@ export default function PlaceContents({
                 ? a.createdAt.localeCompare(b.createdAt)
                 : b.createdAt.localeCompare(a.createdAt);
         });
+    const filters = [
+        { value: 'all', label: 'Wszystkie' },
+        ...Array.from(new Set(items.map((item) => item.category)))
+            .sort((a, b) => a.localeCompare(b, 'pl'))
+            .map((value) => ({ value, label: value })),
+    ].map((option) => ({
+        ...option,
+        count: items.filter(
+            (item) => option.value === 'all' || item.category === option.value,
+        ).length,
+    }));
 
     return (
         <SectionCard
@@ -72,103 +74,68 @@ export default function PlaceContents({
             }
             className="min-w-0"
         >
-            <div className="mb-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
-                <Input.Search
-                    aria-label="Szukaj przedmiotu w lokalizacji"
-                    placeholder="Szukaj modelu, numeru EQ..."
-                    value={searchInput}
-                    onChange={(event) => setSearchInput(event.target.value)}
-                    onSearch={(value) => {
-                        setSearch(value);
-                        setPage(1);
-                    }}
-                    className="min-w-0 sm:col-span-2"
-                />
-                <Select
-                    aria-label="Filtruj przedmioty według kategorii"
+            <div className="mb-4">
+                <Filters
+                    variant="muted"
+                    options={filters}
                     value={category}
-                    options={[
-                        { value: 'all', label: 'Kategoria: Wszystkie' },
-                        ...Array.from(
-                            new Set(items.map((item) => item.category)),
-                        ).map((value) => ({
-                            value,
-                            label: categoryLabels[value] ?? value,
-                        })),
-                    ]}
                     onChange={(value) => {
                         setCategory(value);
                         setPage(1);
                     }}
-                    className="min-w-0"
-                />
-                <Select
-                    aria-label="Sortuj przedmioty"
-                    value={sort}
-                    options={[
-                        { value: 'newest', label: 'Sortuj: Najnowsze' },
-                        { value: 'oldest', label: 'Sortuj: Najstarsze' },
-                        { value: 'name', label: 'Sortuj: Nazwa A–Z' },
-                    ]}
-                    onChange={(value) => {
+                    search={searchInput}
+                    onSearchChange={setSearchInput}
+                    onSearch={(value) => {
+                        setSearch(value);
+                        setPage(1);
+                    }}
+                    searchPlaceholder="Szukaj w przedmiotach..."
+                    sortOptions={sortOptions}
+                    sort={sort}
+                    onSortChange={(value) => {
                         setSort(value);
                         setPage(1);
                     }}
-                    className="min-w-0"
                 />
             </div>
             <ItemsTable
                 items={filteredItems.map((item) => ({
                     id: item.id,
                     title: item.name,
-                    icon: <ToolOutlined aria-hidden="true" />,
+                    badge: `#${item.id}`,
                     description: (
-                        <span className="flex flex-wrap items-center gap-x-2 gap-y-1">
-                            <span className="font-mono">#{item.id}</span>
-                            <span>
-                                {categoryLabels[item.category] ?? item.category}
-                            </span>
-                            <span className="inline-flex items-center gap-1.5">
-                                <span
-                                    className={`size-1.5 rounded-full ${statusColors[item.status.tone]}`}
-                                />
-                                {item.status.label}
-                            </span>
-                            <span>
-                                {item.quantity} {item.unit}
-                            </span>
+                        <span className="flex flex-wrap items-center gap-x-2">
+                            <span>{item.category}</span>
+                            {item.storagePlaceName && (
+                                <span className="text-(--button-text)">
+                                    Na miejscu: {item.storagePlaceName}
+                                </span>
+                            )}
                         </span>
                     ),
+                    value: (
+                        <span className="whitespace-nowrap text-sm!">
+                            {item.quantity}{' '}
+                            {item.unit === 'sztuka' ? 'szt.' : item.unit}
+                        </span>
+                    ),
+                    status: item.needsPacking ? (
+                        <Tag className="m-0! rounded-full! border-0! bg-primary-soft! px-3! py-1! font-semibold! text-primary!">
+                            Do spakowania
+                        </Tag>
+                    ) : undefined,
                     actions: (
-                        <div className="flex items-center justify-end gap-1">
-                            <Button
-                                type="secondary"
-                                size="small"
-                                onClick={() =>
-                                    router.visit(showThing(item.slug).url)
-                                }
-                            >
-                                Szczegóły
-                            </Button>
-                            <Tooltip title="Przenieś przedmiot">
-                                <Button
-                                    type="text"
-                                    size="small"
-                                    icon={<ExportOutlined />}
-                                    aria-label={`Przenieś: ${item.name}`}
-                                    onClick={() =>
-                                        message.info(
-                                            'Przenoszenie przedmiotu będzie dostępne po podłączeniu backendu.',
-                                        )
-                                    }
-                                />
-                            </Tooltip>
-                        </div>
+                        <Button
+                            type="text"
+                            size="small"
+                            onClick={() => router.visit(showThing(item.slug).url)}
+                        >
+                            Szczegóły
+                        </Button>
                     ),
                 }))}
-                pagination={{ current: page, onChange: setPage, pageSize: 5 }}
-                actionsColumnWidth={176}
-                className="[&_.ant-table-row]:bg-tertiary! [&_.ant-table-tbody>tr>td]:bg-tertiary!"
+                pagination={{ current: page, onChange: setPage }}
+                variant="muted"
                 locale={{
                     emptyText: items.length
                         ? 'Brak przedmiotów pasujących do filtrów'

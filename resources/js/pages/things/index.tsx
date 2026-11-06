@@ -1,6 +1,6 @@
 import { EnvironmentOutlined, PlusOutlined } from '@ant-design/icons';
 import { Head, router } from '@inertiajs/react';
-import clsx from 'clsx';
+import { Tag } from 'antd';
 import { useState } from 'react';
 import Button from '@/components/Button';
 import Filters from '@/components/filters';
@@ -10,66 +10,7 @@ import Statistics from '@/components/statistics';
 import { things } from '@/routes';
 import { add as addThing, show as showThing } from '@/routes/things';
 import type { Thing } from './data';
-import { mockThings } from './data';
-
-const statistics = [
-    {
-        label: 'Łączne wydatki (m/m)',
-        value: '4 850 zł',
-        icon: '/icons/money.svg',
-        description: (
-            <span className="flex items-center gap-1.5 text-primary sm:gap-2">
-                <img
-                    src="/icons/trend-down.svg"
-                    alt=""
-                    className="size-3.5 sm:size-4"
-                />
-                -12% vs poprz. m-c
-            </span>
-        ),
-    },
-    {
-        label: 'Rachunki i media',
-        value: '1 620 zł',
-        icon: '/icons/bolt.svg',
-        description: (
-            <>
-                <span
-                    aria-hidden="true"
-                    className="size-1.5 shrink-0 rounded-full bg-primary sm:size-2"
-                />
-                <span>W normie</span>
-            </>
-        ),
-    },
-    {
-        label: 'Utrzymanie i serwisy',
-        value: '850 zł',
-        icon: '/icons/wrench.svg',
-        description: 'Kocioł, filtry osmozy',
-    },
-    {
-        label: 'Zapasy i pojazdy',
-        value: '2 380 zł',
-        icon: '/icons/car.svg',
-        description: 'Paliwo + zakupy',
-    },
-];
-
-const filters = [
-    { value: 'all', label: 'Wszystkie' },
-    { value: 'kitchen', label: 'Kuchnia' },
-    { value: 'living-room', label: 'Salon' },
-    { value: 'garage', label: 'Garaż & Warsztat' },
-    { value: 'bedroom', label: 'Sypialnia' },
-    { value: 'bathroom', label: 'Łazienka' },
-    { value: 'garden', label: 'Ogród' },
-].map((option) => ({
-    ...option,
-    count: mockThings.filter(
-        (item) => option.value === 'all' || item.category === option.value,
-    ).length,
-}));
+import type { ThingCategoryOption } from './form-types';
 
 const sortOptions = [
     { value: 'newest', label: 'Najnowsze' },
@@ -77,37 +18,24 @@ const sortOptions = [
     { value: 'name', label: 'Nazwa A–Z' },
 ];
 
-const statusClasses: Record<Thing['status']['tone'], string> = {
-    danger: 'bg-todo-danger-muted-surface text-todo-danger',
-    success: 'bg-primary/10 text-primary',
-    neutral: 'bg-surface-muted text-(--button-text)',
-};
-
-function ThingStatus({ item }: { item: Thing }) {
-    return (
-        <span
-            className={clsx(
-                'inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold whitespace-nowrap before:size-1.5 before:rounded-full before:bg-current sm:text-sm',
-                statusClasses[item.status.tone],
-            )}
-        >
-            {item.status.label}
-        </span>
-    );
-}
-
-export default function Things() {
+export default function Things({
+    categories,
+    things: items,
+}: {
+    categories: ThingCategoryOption[];
+    things: Thing[];
+}) {
     const [filter, setFilter] = useState('all');
     const [searchInput, setSearchInput] = useState('');
     const [search, setSearch] = useState('');
     const [sort, setSort] = useState('newest');
     const [page, setPage] = useState(1);
     const query = search.trim().toLocaleLowerCase('pl');
-    const filteredThings = mockThings
+    const filteredThings = items
         .filter(
             (item) =>
                 (filter === 'all' || item.category === filter) &&
-                `${item.name} ${item.id} ${item.location}`
+                `${item.name} ${item.id} ${item.location} ${item.category}`
                     .toLocaleLowerCase('pl')
                     .includes(query),
         )
@@ -120,6 +48,45 @@ export default function Things() {
                 ? a.createdAt.localeCompare(b.createdAt)
                 : b.createdAt.localeCompare(a.createdAt);
         });
+
+    const statistics = [
+        {
+            label: 'Łącznie przedmiotów',
+            value: String(items.length),
+            icon: '/icons/catalog.svg',
+            description: 'Wszystkie zapisane pozycje',
+        },
+        {
+            label: 'W pomieszczeniach',
+            value: String(items.filter((item) => item.placeKind === 'room').length),
+            icon: '/icons/zone.svg',
+            description: 'Przypisane bezpośrednio do pomieszczeń',
+        },
+        {
+            label: 'W pudełkach QR',
+            value: String(items.filter((item) => item.placeKind === 'box').length),
+            icon: '/icons/qr-box.svg',
+            description: 'Przypisane do oznaczonych pojemników',
+        },
+        {
+            label: 'Na regałach',
+            value: String(items.filter((item) => item.placeKind === 'rack').length),
+            icon: '/icons/catalog.svg',
+            description: 'Przypisane do regałów lub mebli',
+        },
+    ];
+    const filters = [
+        { value: 'all', label: 'Wszystkie' },
+        ...categories.map((category) => ({
+            value: category.name,
+            label: category.name,
+        })),
+    ].map((option) => ({
+        ...option,
+        count: items.filter(
+            (item) => option.value === 'all' || item.category === option.value,
+        ).length,
+    }));
 
     const tableItems = filteredThings.map((item) => {
         return {
@@ -135,9 +102,16 @@ export default function Things() {
                     {item.location}
                 </>
             ),
-            value: `${item.quantity} ${item.unit}`,
-            secondaryValue: `Min: ${item.minimum} ${item.unit}`,
-            status: <ThingStatus item={item} />,
+            value: (
+                <span className="whitespace-nowrap text-sm!">
+                    {item.quantity} {item.unit === 'sztuka' ? 'szt.' : item.unit}
+                </span>
+            ),
+            status: item.needsPacking ? (
+                <Tag className="m-0! rounded-full! border-0! bg-primary-soft! px-3! py-1! font-semibold! text-primary!">
+                    Do spakowania
+                </Tag>
+            ) : undefined,
             actions: (
                 <Button
                     type="secondary"
@@ -152,11 +126,11 @@ export default function Things() {
 
     return (
         <>
-            <Head title="Things" />
+            <Head title="Przedmioty" />
             <div className="flex flex-col gap-5 sm:gap-8">
                 <Heading
                     title="Przedmioty"
-                    description="Katalog sprzętów domowych, elektroniki i wyposażenia z historią oraz kodami QR."
+                    description="Katalog przedmiotów, ilości i ich lokalizacji w domu."
                     primaryButtonProps={{
                         children: 'Dodaj przedmiot',
                         icon: <PlusOutlined />,
