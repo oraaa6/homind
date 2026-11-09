@@ -1,15 +1,3 @@
-import Button from '@/components/Button';
-import Heading from '@/components/heading';
-import PlaceActivityCard from '@/components/places/activity';
-import ChangePlaceLocationModal from '@/components/places/change-location-modal';
-import PlaceContents from '@/components/places/contents';
-import PlaceLabelCard from '@/components/places/label-card';
-import { placeKinds } from '@/components/places/place-kinds';
-import Statistics from '@/components/statistics';
-import type { Thing } from '@/pages/things/data';
-import { places } from '@/routes';
-import { destroy as destroyPlace, show as showPlace } from '@/routes/places';
-import { add as addThing } from '@/routes/things';
 import {
     DeleteOutlined,
     EnvironmentOutlined,
@@ -18,23 +6,40 @@ import {
 import { Head, router } from '@inertiajs/react';
 import { message, Popconfirm } from 'antd';
 import { useState } from 'react';
-import type { Place, PlaceActivity } from './data';
+import Button from '@/components/Button';
+import Heading from '@/components/heading';
+import PlaceActivityCard from '@/components/places/activity';
+import ChangePlaceLocationModal from '@/components/places/change-location-modal';
+import PlaceContents from '@/components/places/contents';
+import PlaceLabelCard from '@/components/places/label-card';
+import { placeKinds } from '@/components/places/place-kinds';
+import Statistics from '@/components/statistics';
+import type { Thing } from '@/pages/things/types';
+import { places } from '@/routes';
+import { destroy as destroyPlace, show as showPlace } from '@/routes/places';
+import { add as addThing } from '@/routes/things';
+import type { Place, PlaceActivity } from './types';
 
 export default function ShowPlace({
     place,
     things,
+    history,
+    historyCount,
+    historyHasMore,
     parentName,
     placePath,
     rooms,
 }: {
     place: Place;
     things: Thing[];
+    history: PlaceActivity[];
+    historyCount: number;
+    historyHasMore: boolean;
     parentName?: string | null;
     placePath?: string;
     rooms: { id: number; name: string }[];
 }) {
     const [locationModalOpen, setLocationModalOpen] = useState(false);
-    const history: PlaceActivity[] = [];
     const room = parentName ?? place.name;
     const statistics = [
         {
@@ -49,16 +54,6 @@ export default function ShowPlace({
             icon: '/icons/zone.svg',
             description: place.levelLabel,
         },
-        ...(place.kind !== 'room'
-            ? [
-                  {
-                      label: 'Ostatni skan',
-                      value: 'Brak skanów',
-                      icon: '/icons/qr-box.svg',
-                      description: 'Ta lokalizacja nie była jeszcze skanowana',
-                  },
-              ]
-            : []),
     ];
 
     const path = placePath ?? showPlace(place.slug).url;
@@ -144,7 +139,11 @@ export default function ShowPlace({
                         kind={place.kind}
                     />
                 </div>
-                <PlaceActivityCard history={history} />
+                <PlaceActivityCard
+                    history={history}
+                    historyCount={historyCount}
+                    historyHasMore={historyHasMore}
+                />
             </div>
             {locationModalOpen && (
                 <ChangePlaceLocationModal

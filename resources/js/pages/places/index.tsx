@@ -1,21 +1,15 @@
 import { EnvironmentOutlined, PlusOutlined } from '@ant-design/icons';
 import { Head, router } from '@inertiajs/react';
-import { useState } from 'react';
 import Button from '@/components/Button';
 import Filters from '@/components/filters';
 import Heading from '@/components/heading';
 import ItemsTable from '@/components/items-table';
 import { placeKinds } from '@/components/places/place-kinds';
 import Statistics from '@/components/statistics';
+import useListControls, { listSortOptions } from '@/hooks/use-list-controls';
 import { places } from '@/routes';
 import { add as addPlace, show as showPlace } from '@/routes/places';
-import type { Place } from './data';
-
-const sortOptions = [
-    { value: 'newest', label: 'Najnowsze' },
-    { value: 'oldest', label: 'Najstarsze' },
-    { value: 'name', label: 'Nazwa A–Z' },
-];
+import type { Place } from './types';
 
 export default function Places({
     places: placesData,
@@ -24,49 +18,39 @@ export default function Places({
     places: Place[];
     totalThings: number;
 }) {
-    const [filter, setFilter] = useState('all');
-    const [searchInput, setSearchInput] = useState('');
-    const [search, setSearch] = useState('');
-    const [sort, setSort] = useState('newest');
-    const [page, setPage] = useState(1);
-    const query = search.trim().toLocaleLowerCase('pl');
-    const filteredPlaces = placesData
-        .filter(
-            (place) =>
-                (filter === 'all' || place.kind === filter) &&
-                `${place.name} ${place.id} ${place.description} ${place.levelLabel} ${placeKinds[place.kind].label}`
-                    .toLocaleLowerCase('pl')
-                    .includes(query),
-        )
-        .sort((a, b) => {
-            if (sort === 'name') {
-                return a.name.localeCompare(b.name, 'pl');
-            }
-
-            return sort === 'oldest'
-                ? a.createdAt.localeCompare(b.createdAt)
-                : b.createdAt.localeCompare(a.createdAt);
-        });
+    const controls = useListControls({
+        items: placesData,
+        getFilterValue: (place) => place.kind,
+        getSearchText: (place) =>
+            `${place.name} ${place.id} ${place.parentName ?? ''} ${place.description} ${place.levelLabel} ${placeKinds[place.kind].label}`,
+        pageSize: 16,
+    });
+    const filteredPlaces = controls.filteredItems;
 
     const tableItems = filteredPlaces.map((place) => {
         return {
             id: place.id,
             title: place.name,
-            description: place.parentName || place.description ? (
-                <>
-                    <EnvironmentOutlined
-                        className="mt-0.5 shrink-0"
-                        aria-hidden="true"
-                    />
-                    <span className="flex min-w-0 flex-wrap items-center gap-x-1.5">
-                        {place.parentName && <span>{place.parentName}</span>}
-                        {place.parentName && place.description && (
-                            <span aria-hidden="true">·</span>
-                        )}
-                        {place.description && <span>{place.description}</span>}
-                    </span>
-                </>
-            ) : undefined,
+            description:
+                place.parentName || place.description ? (
+                    <>
+                        <EnvironmentOutlined
+                            className="mt-0.5 shrink-0"
+                            aria-hidden="true"
+                        />
+                        <span className="flex min-w-0 flex-wrap items-center gap-x-1.5">
+                            {place.parentName && (
+                                <span>{place.parentName}</span>
+                            )}
+                            {place.parentName && place.description && (
+                                <span aria-hidden="true">·</span>
+                            )}
+                            {place.description && (
+                                <span>{place.description}</span>
+                            )}
+                        </span>
+                    </>
+                ) : undefined,
             value: (
                 <span className="text-sm whitespace-nowrap sm:text-base">
                     Przedmioty: {place.thingCount}
@@ -92,14 +76,18 @@ export default function Places({
     const statistics = [
         {
             label: 'Wszystkie strefy',
-            value: String(placesData.filter((place) => place.kind === 'room').length),
+            value: String(
+                placesData.filter((place) => place.kind === 'room').length,
+            ),
             icon: '/icons/zone.svg',
             description: 'Pomieszczenia i otoczenie domu',
         },
         {
             label: 'Obiekty z kodem QR',
             value: String(
-                placesData.filter((place) => place.kind !== 'room' && place.qrCode).length,
+                placesData.filter(
+                    (place) => place.kind !== 'room' && place.qrCode,
+                ).length,
             ),
             icon: '/icons/qr-box.svg',
             description: 'Oznaczone regały i pojemniki',
@@ -140,29 +128,20 @@ export default function Places({
                 <Statistics items={statistics} />
                 <Filters
                     options={filters}
-                    value={filter}
-                    onChange={(value) => {
-                        setFilter(value);
-                        setPage(1);
-                    }}
-                    search={searchInput}
-                    onSearchChange={setSearchInput}
-                    onSearch={(value) => {
-                        setSearch(value);
-                        setPage(1);
-                    }}
+                    value={controls.filter}
+                    onChange={controls.onFilterChange}
+                    search={controls.searchInput}
+                    onSearchChange={controls.onSearchInputChange}
+                    onSearch={controls.onSearch}
                     searchPlaceholder="Szukaj lokalizacji..."
-                    sortOptions={sortOptions}
-                    sort={sort}
-                    onSortChange={(value) => {
-                        setSort(value);
-                        setPage(1);
-                    }}
+                    sortOptions={listSortOptions}
+                    sort={controls.sort}
+                    onSortChange={controls.onSortChange}
                 />
                 <ItemsTable
                     items={tableItems}
                     valueColumnWidth={168}
-                    pagination={{ current: page, onChange: setPage }}
+                    pagination={controls.pagination}
                 />
             </div>
         </>

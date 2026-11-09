@@ -4,9 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StorePlaceRequest;
 use App\Http\Requests\UpdatePlaceRequest;
+use App\Models\ActivityLog;
 use App\Models\Household;
 use App\Models\Place;
 use App\Models\Thing;
+use App\Services\ActivityLogger;
+use App\Services\ActivityLogPresenter;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -63,16 +66,15 @@ class PlaceController extends Controller
                 'id' => $household->id,
                 'name' => $household->name,
             ]),
-            'rooms' => $households->flatMap(fn (Household $household) =>
-                $household->places->map(fn (Place $place) => [
-                    'id' => $place->id,
-                    'household_id' => $household->id,
-                    'name' => $place->name,
-                ])),
+            'rooms' => $households->flatMap(fn (Household $household) => $household->places->map(fn (Place $place) => [
+                'id' => $place->id,
+                'household_id' => $household->id,
+                'name' => $place->name,
+            ])),
         ]);
     }
 
-    public function store(StorePlaceRequest $request): RedirectResponse
+    public function store(StorePlaceRequest $request, ActivityLogger $activityLogger): RedirectResponse
     {
         $validated = $request->validated();
 
@@ -81,24 +83,47 @@ class PlaceController extends Controller
             ? $household->places()->find($validated['parent_id'])
             : null;
 
-        $place = DB::transaction(fn () => $household->places()->create([
-            'parent_id' => $parent?->id,
-            'kind' => $validated['kind'],
-            'name' => $validated['name'],
-            'level' => $parent?->level,
-            'placement' => $validated['placement'] ?? null,
-        ]));
+        DB::transaction(function () use ($household, $parent, $validated, $request, $activityLogger) {
+            $place = $household->places()->create([
+                'parent_id' => $parent?->id,
+                'kind' => $validated['kind'],
+                'name' => $validated['name'],
+                'level' => $parent?->level,
+                'placement' => $validated['placement'] ?? null,
+            ]);
+
+            $activityLogger->log(
+                $household,
+                $request->user(),
+                'place_created',
+                [
+                    'place_name' => $place->name,
+                    'place_kind' => $place->kind,
+                    'identifier' => $place->identifier,
+                ],
+                place: $place,
+            );
+        });
 
         return to_route('places');
     }
 
-    public function show(string $element): Response
+    public function show(
+        Request $request,
+        string $element,
+        ActivityLogPresenter $presenter,
+    ): Response
     {
         abort_unless(ctype_digit($element), 404);
         $place = Place::with(['household', 'parent'])->findOrFail($element);
         Gate::authorize('view', $place->household);
 
-        $path = route('places.show', $place->id, false);
+        $path = $place->kind === 'room' || $place->identifier === null
+            ? route('places.show', $place->id, false)
+            : route('places.qr', [
+                'element' => $place->id,
+                'identifier' => $place->identifier,
+            ], false);
         $parent = $place->parent?->household_id === $place->household_id
             ? $place->parent
             : null;
@@ -120,6 +145,22 @@ class PlaceController extends Controller
             );
         }
 
+        $activityQuery = ActivityLog::query()
+            ->where('household_id', $place->household_id)
+            ->where(function ($query) use ($placeIds) {
+                $query->whereIn('place_id', $placeIds)
+                    ->orWhereIn('from_place_id', $placeIds)
+                    ->orWhereIn('to_place_id', $placeIds);
+            });
+        $historyCount = (clone $activityQuery)->count();
+        $historyPage = max(1, $request->integer('history_page', 1));
+        $activityLogs = $activityQuery
+            ->with('user')
+            ->latest()
+            ->orderByDesc('id')
+            ->offset(($historyPage - 1) * 10)
+            ->limit(10)
+            ->get();
         $things = Thing::query()
             ->whereIn('place_id', $placeIds)
             ->with(['category', 'place'])
@@ -142,6 +183,7 @@ class PlaceController extends Controller
                     'placement' => $thing->placement,
                     'quantity' => $thing->quantity,
                     'unit' => $thing->unit,
+                    'unitShort' => $this->unitShortLabel($thing->unit),
                     'needsPacking' => $thing->needs_packing,
                     'createdAt' => $thing->created_at?->toDateString() ?? '',
                 ];
@@ -150,6 +192,11 @@ class PlaceController extends Controller
 
         return Inertia::render('places/show', [
             'things' => $things,
+            'history' => Inertia::merge(
+                $activityLogs->map(fn (ActivityLog $log) => $presenter->forPlace($log))->values(),
+            )->append(),
+            'historyCount' => $historyCount,
+            'historyHasMore' => $historyCount > $historyPage * 10,
             'place' => [
                 'id' => $place->identifier ?? (string) $place->id,
                 'slug' => (string) $place->id,
@@ -176,24 +223,136 @@ class PlaceController extends Controller
         ]);
     }
 
-    public function update(UpdatePlaceRequest $request, string $element): RedirectResponse
+    public function regenerateIdentifier(
+        Request $request,
+        string $element,
+        ActivityLogger $activityLogger,
+    ): RedirectResponse {
+        abort_unless(ctype_digit($element), 404);
+
+        $place = Place::with('household')->findOrFail($element);
+        Gate::authorize('update', $place->household);
+        abort_if($place->kind === 'room', 404);
+
+        $prefix = match ($place->kind) {
+            'rack' => 'RACK',
+            'box' => 'BOX',
+            default => abort(404),
+        };
+        $oldIdentifier = $place->identifier;
+
+        DB::transaction(function () use ($place, $prefix, $oldIdentifier, $request, $activityLogger) {
+            $household = $place->household()->lockForUpdate()->firstOrFail();
+            $identifiers = $household->places()
+                ->where('identifier', 'like', $prefix.'-%')
+                ->pluck('identifier');
+            $lastNumber = $identifiers->reduce(function (int $highest, ?string $value) use ($prefix) {
+                if (preg_match('/^'.preg_quote($prefix, '/').'-(\d+)$/', $value ?? '', $matches) !== 1) {
+                    return $highest;
+                }
+
+                return max($highest, (int) $matches[1]);
+            }, 0);
+            $nextNumber = $lastNumber + 1;
+            $identifier = sprintf('%s-%06d', $prefix, $nextNumber);
+
+            while ($household->places()->where('identifier', $identifier)->exists()) {
+                $identifier = sprintf('%s-%06d', $prefix, ++$nextNumber);
+            }
+
+            $place->forceFill(['identifier' => $identifier])->save();
+
+            $activityLogger->log(
+                $place->household,
+                $request->user(),
+                'place_code_regenerated',
+                [
+                    'place_name' => $place->name,
+                    'old_identifier' => $oldIdentifier,
+                    'identifier' => $identifier,
+                ],
+                place: $place,
+            );
+        });
+
+        return to_route('places.show', $place->id);
+    }
+
+    public function openQr(Request $request, string $element, string $identifier): RedirectResponse
     {
+        abort_unless(ctype_digit($element), 404);
+
+        $place = Place::with('household')->findOrFail($element);
+        Gate::authorize('view', $place->household);
+
+        abort_if(
+            $place->kind === 'room'
+                || ! hash_equals((string) $place->identifier, $identifier),
+            404,
+        );
+
+        return to_route('places.show', $place->id);
+    }
+
+    public function update(
+        UpdatePlaceRequest $request,
+        string $element,
+        ActivityLogger $activityLogger,
+    ): RedirectResponse {
         abort_unless(ctype_digit($element), 404);
 
         $place = Place::with('household')->findOrFail($element);
         Gate::authorize('update', $place->household);
         $validated = $request->validated();
+        $oldParent = $place->parent;
+        $oldPlacement = $place->placement;
+        $newParent = $place->household->places()->findOrFail($validated['parent_id']);
 
-        $place->update([
-            'parent_id' => $validated['parent_id'],
-            'placement' => $validated['placement'] ?? null,
-        ]);
+        DB::transaction(function () use ($place, $validated, $oldParent, $oldPlacement, $newParent, $request, $activityLogger) {
+            $place->update([
+                'parent_id' => $validated['parent_id'],
+                'placement' => $validated['placement'] ?? null,
+            ]);
+
+            if ($oldParent?->id !== $newParent->id) {
+                $activityLogger->log(
+                    $place->household,
+                    $request->user(),
+                    'place_moved',
+                    [
+                        'place_name' => $place->name,
+                        'from_place_name' => $oldParent?->name,
+                        'to_place_name' => $newParent->name,
+                        'old_placement' => $oldPlacement,
+                        'new_placement' => $place->placement,
+                    ],
+                    place: $place,
+                    fromPlace: $oldParent,
+                    toPlace: $newParent,
+                );
+            } elseif ($oldPlacement !== $place->placement) {
+                $activityLogger->log(
+                    $place->household,
+                    $request->user(),
+                    'place_updated',
+                    [
+                        'place_name' => $place->name,
+                        'old_placement' => $oldPlacement,
+                        'new_placement' => $place->placement,
+                    ],
+                    place: $place,
+                );
+            }
+        });
 
         return to_route('places.show', $place->id);
     }
 
-    public function destroy(string $element): RedirectResponse
-    {
+    public function destroy(
+        Request $request,
+        string $element,
+        ActivityLogger $activityLogger,
+    ): RedirectResponse {
         abort_unless(ctype_digit($element), 404);
 
         $place = Place::with('household')->findOrFail($element);
@@ -205,7 +364,25 @@ class PlaceController extends Controller
             ]);
         }
 
-        $place->delete();
+        $parent = $place->parent;
+
+        DB::transaction(function () use ($place, $parent, $request, $activityLogger) {
+            $activityLogger->log(
+                $place->household,
+                $request->user(),
+                'place_deleted',
+                [
+                    'place_name' => $place->name,
+                    'place_kind' => $place->kind,
+                    'identifier' => $place->identifier,
+                    'from_place_name' => $parent?->name,
+                ],
+                place: $place,
+                fromPlace: $parent,
+            );
+
+            $place->delete();
+        });
 
         return to_route('places');
     }
@@ -240,4 +417,12 @@ class PlaceController extends Controller
             'thingCount' => $thingCount,
         ];
     }
+
+    private function unitShortLabel(string $unit): string
+    {
+        $units = config('thing-units', []);
+
+        return $units[$unit]['short'] ?? $units[$unit]['label'] ?? $unit;
+    }
+
 }

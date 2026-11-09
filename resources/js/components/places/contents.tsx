@@ -1,12 +1,12 @@
 import { router } from '@inertiajs/react';
 import { Tag } from 'antd';
-import { useState } from 'react';
 import Button from '@/components/Button';
 import Filters from '@/components/filters';
 import ItemsTable from '@/components/items-table';
 import SectionCard from '@/components/section-card';
-import type { Place } from '@/pages/places/data';
-import type { Thing } from '@/pages/things/data';
+import useListControls, { listSortOptions } from '@/hooks/use-list-controls';
+import type { Place } from '@/pages/places/types';
+import type { Thing } from '@/pages/things/types';
 import { show as showThing } from '@/routes/things';
 
 const contentTitles = {
@@ -15,12 +15,6 @@ const contentTitles = {
     room: 'Przedmioty w tej lokalizacji',
 };
 
-const sortOptions = [
-    { value: 'newest', label: 'Najnowsze' },
-    { value: 'oldest', label: 'Najstarsze' },
-    { value: 'name', label: 'Nazwa A–Z' },
-];
-
 export default function PlaceContents({
     items,
     kind,
@@ -28,29 +22,15 @@ export default function PlaceContents({
     items: Thing[];
     kind: Place['kind'];
 }) {
-    const [searchInput, setSearchInput] = useState('');
-    const [search, setSearch] = useState('');
-    const [category, setCategory] = useState('all');
-    const [sort, setSort] = useState('newest');
-    const [page, setPage] = useState(1);
-    const query = search.trim().toLocaleLowerCase('pl');
-    const filteredItems = items
-        .filter(
-            (item) =>
-                (category === 'all' || item.category === category) &&
-                `${item.name} ${item.id} ${item.category} ${item.storagePlaceName ?? ''}`
-                    .toLocaleLowerCase('pl')
-                    .includes(query),
-        )
-        .sort((a, b) => {
-            if (sort === 'name') {
-                return a.name.localeCompare(b.name, 'pl');
-            }
+    const controls = useListControls({
+        items,
+        getFilterValue: (item) => item.category,
+        getSearchText: (item) =>
+            `${item.name} ${item.id} ${item.category} ${item.storagePlaceName ?? ''}`,
+        pageSize: 10,
+    });
+    const filteredItems = controls.filteredItems;
 
-            return sort === 'oldest'
-                ? a.createdAt.localeCompare(b.createdAt)
-                : b.createdAt.localeCompare(a.createdAt);
-        });
     const filters = [
         { value: 'all', label: 'Wszystkie' },
         ...Array.from(new Set(items.map((item) => item.category)))
@@ -78,24 +58,15 @@ export default function PlaceContents({
                 <Filters
                     variant="muted"
                     options={filters}
-                    value={category}
-                    onChange={(value) => {
-                        setCategory(value);
-                        setPage(1);
-                    }}
-                    search={searchInput}
-                    onSearchChange={setSearchInput}
-                    onSearch={(value) => {
-                        setSearch(value);
-                        setPage(1);
-                    }}
+                    value={controls.filter}
+                    onChange={controls.onFilterChange}
+                    search={controls.searchInput}
+                    onSearchChange={controls.onSearchInputChange}
+                    onSearch={controls.onSearch}
                     searchPlaceholder="Szukaj w przedmiotach..."
-                    sortOptions={sortOptions}
-                    sort={sort}
-                    onSortChange={(value) => {
-                        setSort(value);
-                        setPage(1);
-                    }}
+                    sortOptions={listSortOptions}
+                    sort={controls.sort}
+                    onSortChange={controls.onSortChange}
                 />
             </div>
             <ItemsTable
@@ -114,13 +85,15 @@ export default function PlaceContents({
                         </span>
                     ),
                     value: (
-                        <span className="whitespace-nowrap text-sm!">
-                            {item.quantity}{' '}
-                            {item.unit === 'sztuka' ? 'szt.' : item.unit}
+                        <span className="text-sm! whitespace-nowrap">
+                            {item.quantity} {item.unitShort}
                         </span>
                     ),
                     status: item.needsPacking ? (
-                        <Tag className="m-0! rounded-full! border-0! bg-primary-soft! px-3! py-1! font-semibold! text-primary!">
+                        <Tag
+                            color="red"
+                            className="m-0! rounded-full! px-3! py-1! font-semibold!"
+                        >
                             Do spakowania
                         </Tag>
                     ) : undefined,
@@ -128,13 +101,15 @@ export default function PlaceContents({
                         <Button
                             type="text"
                             size="small"
-                            onClick={() => router.visit(showThing(item.slug).url)}
+                            onClick={() =>
+                                router.visit(showThing(item.slug).url)
+                            }
                         >
                             Szczegóły
                         </Button>
                     ),
                 }))}
-                pagination={{ current: page, onChange: setPage }}
+                pagination={controls.pagination}
                 variant="muted"
                 locale={{
                     emptyText: items.length

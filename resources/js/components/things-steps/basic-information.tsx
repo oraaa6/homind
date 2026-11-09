@@ -1,28 +1,24 @@
+import { PlusOutlined } from '@ant-design/icons';
+import { useForm } from '@inertiajs/react';
+import { Form, Input, InputNumber, message, Modal, Select, Tag } from 'antd';
+import { useState } from 'react';
 import Button from '@/components/Button';
 import SectionCard from '@/components/section-card';
 import type {
     ThingCategoryOption,
     ThingFormState,
-} from '@/pages/things/form-types';
+    ThingUnitOption,
+} from '@/pages/things/types';
 import { store as storeCategory } from '@/routes/categories';
-import { PlusOutlined } from '@ant-design/icons';
-import { useForm } from '@inertiajs/react';
-import { Form, Input, InputNumber, message, Modal, Select, Tag } from 'antd';
-import { useState } from 'react';
-
-const units = ['sztuka', 'opakowanie', 'karton', 'butelka', 'ryza'].map(
-    (unit) => ({
-        value: unit,
-        label: unit,
-    }),
-);
 
 export default function BasicInformationStep({
     form,
     categories,
+    units,
 }: {
     form: ThingFormState;
     categories: ThingCategoryOption[];
+    units: ThingUnitOption[];
 }) {
     const [categoryModalOpen, setCategoryModalOpen] = useState(false);
     const categoryForm = useForm({ category_name: '' });

@@ -3,7 +3,7 @@ import {
     HomeOutlined,
     InboxOutlined,
 } from '@ant-design/icons';
-import type { Place } from '@/pages/places/data';
+import type { Place } from '@/pages/places/types';
 
 export const placeKinds = {
     rack: {
@@ -15,7 +15,7 @@ export const placeKinds = {
         labelType: 'REGAŁ',
     },
     box: {
-        label: 'Pudełko QR',
+        label: 'Pudełko',
         title: 'Pudełko / Pojemnik',
         description: 'Ruchomy karton, skrzynia plastikowa, organizer.',
         icon: InboxOutlined,

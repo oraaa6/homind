@@ -3,8 +3,7 @@ import { Form, Radio } from 'antd';
 import clsx from 'clsx';
 import { placeKinds } from '@/components/places/place-kinds';
 import SectionCard from '@/components/section-card';
-import type { Place } from '@/pages/places/data';
-import type { PlaceFormState } from '@/pages/places/form-types';
+import type { Place, PlaceFormState } from '@/pages/places/types';
 
 export default function TypeStep({
     form,

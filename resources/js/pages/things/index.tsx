@@ -1,22 +1,15 @@
 import { EnvironmentOutlined, PlusOutlined } from '@ant-design/icons';
 import { Head, router } from '@inertiajs/react';
 import { Tag } from 'antd';
-import { useState } from 'react';
 import Button from '@/components/Button';
 import Filters from '@/components/filters';
 import Heading from '@/components/heading';
 import ItemsTable from '@/components/items-table';
 import Statistics from '@/components/statistics';
+import useListControls, { listSortOptions } from '@/hooks/use-list-controls';
 import { things } from '@/routes';
 import { add as addThing, show as showThing } from '@/routes/things';
-import type { Thing } from './data';
-import type { ThingCategoryOption } from './form-types';
-
-const sortOptions = [
-    { value: 'newest', label: 'Najnowsze' },
-    { value: 'oldest', label: 'Najstarsze' },
-    { value: 'name', label: 'Nazwa A–Z' },
-];
+import type { Thing, ThingCategoryOption } from './types';
 
 export default function Things({
     categories,
@@ -25,29 +18,14 @@ export default function Things({
     categories: ThingCategoryOption[];
     things: Thing[];
 }) {
-    const [filter, setFilter] = useState('all');
-    const [searchInput, setSearchInput] = useState('');
-    const [search, setSearch] = useState('');
-    const [sort, setSort] = useState('newest');
-    const [page, setPage] = useState(1);
-    const query = search.trim().toLocaleLowerCase('pl');
-    const filteredThings = items
-        .filter(
-            (item) =>
-                (filter === 'all' || item.category === filter) &&
-                `${item.name} ${item.id} ${item.location} ${item.category}`
-                    .toLocaleLowerCase('pl')
-                    .includes(query),
-        )
-        .sort((a, b) => {
-            if (sort === 'name') {
-                return a.name.localeCompare(b.name, 'pl');
-            }
-
-            return sort === 'oldest'
-                ? a.createdAt.localeCompare(b.createdAt)
-                : b.createdAt.localeCompare(a.createdAt);
-        });
+    const controls = useListControls({
+        items,
+        getFilterValue: (item) => item.category,
+        getSearchText: (item) =>
+            `${item.name} ${item.id} ${item.location} ${item.category}`,
+        pageSize: 6,
+    });
+    const filteredThings = controls.filteredItems;
 
     const statistics = [
         {
@@ -58,19 +36,25 @@ export default function Things({
         },
         {
             label: 'W pomieszczeniach',
-            value: String(items.filter((item) => item.placeKind === 'room').length),
+            value: String(
+                items.filter((item) => item.placeKind === 'room').length,
+            ),
             icon: '/icons/zone.svg',
             description: 'Przypisane bezpośrednio do pomieszczeń',
         },
         {
-            label: 'W pudełkach QR',
-            value: String(items.filter((item) => item.placeKind === 'box').length),
+            label: 'W pudełkach',
+            value: String(
+                items.filter((item) => item.placeKind === 'box').length,
+            ),
             icon: '/icons/qr-box.svg',
             description: 'Przypisane do oznaczonych pojemników',
         },
         {
             label: 'Na regałach',
-            value: String(items.filter((item) => item.placeKind === 'rack').length),
+            value: String(
+                items.filter((item) => item.placeKind === 'rack').length,
+            ),
             icon: '/icons/catalog.svg',
             description: 'Przypisane do regałów lub mebli',
         },
@@ -103,12 +87,15 @@ export default function Things({
                 </>
             ),
             value: (
-                <span className="whitespace-nowrap text-sm!">
-                    {item.quantity} {item.unit === 'sztuka' ? 'szt.' : item.unit}
+                <span className="text-sm! whitespace-nowrap">
+                    {item.quantity} {item.unitShort}
                 </span>
             ),
             status: item.needsPacking ? (
-                <Tag className="m-0! rounded-full! border-0! bg-primary-soft! px-3! py-1! font-semibold! text-primary!">
+                <Tag
+                    color="red"
+                    className="m-0! rounded-full! px-3! py-1! font-semibold!"
+                >
                     Do spakowania
                 </Tag>
             ) : undefined,
@@ -140,28 +127,19 @@ export default function Things({
                 <Statistics items={statistics} />
                 <Filters
                     options={filters}
-                    value={filter}
-                    onChange={(value) => {
-                        setFilter(value);
-                        setPage(1);
-                    }}
-                    search={searchInput}
-                    onSearchChange={setSearchInput}
-                    onSearch={(value) => {
-                        setSearch(value);
-                        setPage(1);
-                    }}
+                    value={controls.filter}
+                    onChange={controls.onFilterChange}
+                    search={controls.searchInput}
+                    onSearchChange={controls.onSearchInputChange}
+                    onSearch={controls.onSearch}
                     searchPlaceholder="Szukaj w zasobach..."
-                    sortOptions={sortOptions}
-                    sort={sort}
-                    onSortChange={(value) => {
-                        setSort(value);
-                        setPage(1);
-                    }}
+                    sortOptions={listSortOptions}
+                    sort={controls.sort}
+                    onSortChange={controls.onSortChange}
                 />
                 <ItemsTable
                     items={tableItems}
-                    pagination={{ current: page, onChange: setPage }}
+                    pagination={controls.pagination}
                 />
             </div>
         </>

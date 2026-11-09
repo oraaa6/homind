@@ -1,58 +1,30 @@
-import { HistoryOutlined } from '@ant-design/icons';
 import { Empty } from 'antd';
+import type { ActivityEntry } from '@/components/activity-list';
+import ActivityList from '@/components/activity-list';
 import SectionCard from '@/components/section-card';
-import type { ThingDetails } from '@/pages/things/data';
 
 export default function LocationHistory({
     history,
+    historyCount,
+    historyHasMore,
 }: {
-    history: ThingDetails['history'];
+    history: ActivityEntry[];
+    historyCount: number;
+    historyHasMore: boolean;
 }) {
     return (
         <SectionCard
-            title={
-                <>
-                    <HistoryOutlined
-                        className="text-primary"
-                        aria-hidden="true"
-                    />
-                    Historia lokalizacji
-                </>
-            }
+            title={'Historia przedmiotu'}
             extra={
                 <span className="shrink-0 text-sm text-(--button-text)">
-                    Liczba wpisów: {history.length}
+                    Liczba wpisów: {historyCount}
                 </span>
             }
         >
-            {history.length === 0 ? (
-                <Empty description="Brak historii lokalizacji" />
+            {history.length ? (
+                <ActivityList entries={history} hasMore={historyHasMore} />
             ) : (
-                <div className="flex flex-col gap-3">
-                    {history.map((entry) => (
-                        <div
-                            key={entry.id}
-                            className="flex flex-col gap-2 rounded-xl bg-tertiary p-4 sm:flex-row sm:items-center sm:justify-between"
-                        >
-                            <div className="min-w-0">
-                                <p className="font-medium text-foreground">
-                                    {entry.location}
-                                </p>
-                                <p className="text-sm text-(--button-text)">
-                                    {entry.description}
-                                </p>
-                            </div>
-                            <time
-                                dateTime={entry.date}
-                                className="shrink-0 text-sm text-(--button-text)"
-                            >
-                                {new Intl.DateTimeFormat('pl-PL').format(
-                                    new Date(`${entry.date}T12:00:00`),
-                                )}
-                            </time>
-                        </div>
-                    ))}
-                </div>
+                <Empty description="Brak historii przedmiotu" />
             )}
         </SectionCard>
     );

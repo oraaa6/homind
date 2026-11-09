@@ -4,17 +4,22 @@ import { Alert, Checkbox, Form, Input, Modal, Select } from 'antd';
 import { useState } from 'react';
 import Button from '@/components/Button';
 import SectionCard from '@/components/section-card';
-import type {
-    ThingFormState,
-    ThingPlaceOption,
-} from '@/pages/things/form-types';
+import type { ThingFormState, ThingPlaceOption } from '@/pages/things/types';
 
-function getPlaceIdFromQr(code: string): number | null {
+function getPlaceFromQr(
+    code: string,
+): { id: number; identifier?: string } | null {
     try {
         const pathname = new URL(code.trim(), 'https://homind.local').pathname;
-        const match = pathname.match(/\/places\/(\d+)\/?$/);
+        const qrMatch = pathname.match(/\/places\/(\d+)\/qr\/([^/]+)\/?$/);
 
-        return match ? Number(match[1]) : null;
+        if (qrMatch) {
+            return { id: Number(qrMatch[1]), identifier: qrMatch[2] };
+        }
+
+        const placeMatch = pathname.match(/\/places\/(\d+)\/?$/);
+
+        return placeMatch ? { id: Number(placeMatch[1]) } : null;
     } catch {
         return null;
     }
@@ -32,11 +37,7 @@ export default function LocationStep({
     const [scanError, setScanError] = useState('');
     const placeOptions = places.map((place) => ({
         value: place.id,
-        label: [
-            place.name,
-            place.parent_name,
-            place.household_name,
-        ]
+        label: [place.name, place.parent_name, place.household_name]
             .filter(Boolean)
             .join(' · '),
     }));
@@ -45,12 +46,23 @@ export default function LocationStep({
     );
 
     const selectScannedPlace = (code: string) => {
-        const id = getPlaceIdFromQr(code);
-        const place = places.find((option) => option.id === id);
+        const scannedPlace = getPlaceFromQr(code);
+        const place = places.find((option) => option.id === scannedPlace?.id);
 
         if (!place) {
             setScanError(
                 'Kod nie wskazuje lokalizacji dostępnej w jednym z Twoich domów.',
+            );
+
+            return;
+        }
+
+        if (
+            scannedPlace?.identifier &&
+            scannedPlace.identifier !== place.identifier
+        ) {
+            setScanError(
+                'Ten kod QR został zastąpiony. Zeskanuj aktualną etykietę lokalizacji.',
             );
 
             return;
@@ -159,8 +171,7 @@ export default function LocationStep({
                                     form.clearErrors('needs_packing');
                                 }}
                             >
-                                Dodaj do kolejki{' '}
-                                <strong>Do spakowania</strong>
+                                Dodaj do kolejki <strong>Do spakowania</strong>
                             </Checkbox>
                         </Form.Item>
                         {selectedPlace && selectedPlace.kind !== 'room' && (

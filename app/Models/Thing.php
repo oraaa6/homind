@@ -3,8 +3,10 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
 
 /**
@@ -20,6 +22,7 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $updated_at
  * @property-read Place $place
  * @property-read Category $category
+ * @property-read Collection<int, ActivityLog> $activityLogs
  */
 #[Fillable(['place_id', 'category_id', 'name', 'placement', 'quantity', 'unit', 'needs_packing'])]
 class Thing extends Model
@@ -42,6 +45,16 @@ class Thing extends Model
     public function place(): BelongsTo
     {
         return $this->belongsTo(Place::class);
+    }
+
+    /**
+     * Activity records associated with this thing.
+     *
+     * @return HasMany<ActivityLog, $this>
+     */
+    public function activityLogs(): HasMany
+    {
+        return $this->hasMany(ActivityLog::class);
     }
 
     /**

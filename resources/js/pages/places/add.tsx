@@ -1,7 +1,7 @@
-import { CheckOutlined, QrcodeOutlined } from '@ant-design/icons';
+import { CheckOutlined } from '@ant-design/icons';
 import type { FormDataErrors } from '@inertiajs/core';
 import { Head, Link, useForm } from '@inertiajs/react';
-import { Form, message } from 'antd';
+import { Form } from 'antd';
 import Button from '@/components/Button';
 import Heading from '@/components/heading';
 import type { RoomOption } from '@/components/places-steps/basic-information';
@@ -11,7 +11,7 @@ import SectionCard from '@/components/section-card';
 import { useFormValidation } from '@/hooks/use-form-validation';
 import { places } from '@/routes';
 import { add as addPlace, store as storePlace } from '@/routes/places';
-import type { PlaceFormData } from './form-types';
+import type { PlaceFormData } from './types';
 
 function validatePlace(data: PlaceFormData): FormDataErrors<PlaceFormData> {
     const errors: FormDataErrors<PlaceFormData> = {};

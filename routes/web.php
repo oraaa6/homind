@@ -27,7 +27,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('places', [PlaceController::class, 'index'])->name('places');
     Route::get('places/add', [PlaceController::class, 'create'])->name('places.add');
     Route::post('places', [PlaceController::class, 'store'])->name('places.store');
+    Route::patch('places/{element}/identifier', [PlaceController::class, 'regenerateIdentifier'])->name('places.identifier.regenerate');
     Route::put('places/{element}', [PlaceController::class, 'update'])->name('places.update');
+    Route::get('places/{element}/qr/{identifier}', [PlaceController::class, 'openQr'])->name('places.qr');
     Route::get('places/{element}', [PlaceController::class, 'show'])->name('places.show');
     Route::delete('places/{element}', [PlaceController::class, 'destroy'])->name('places.destroy');
 });

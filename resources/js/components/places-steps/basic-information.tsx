@@ -1,7 +1,7 @@
 import { AppstoreOutlined, EnvironmentOutlined } from '@ant-design/icons';
 import { Alert, Form, Input, Select } from 'antd';
 import SectionCard from '@/components/section-card';
-import type { PlaceFormState } from '@/pages/places/form-types';
+import type { PlaceFormState } from '@/pages/places/types';
 
 type HouseholdOption = { id: number; name: string };
 export type RoomOption = {

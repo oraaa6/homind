@@ -9,15 +9,13 @@ import BasicInformationStep from '@/components/things-steps/basic-information';
 import LocationStep from '@/components/things-steps/location';
 import { useFormValidation } from '@/hooks/use-form-validation';
 import { things } from '@/routes';
-import {
-    add as addThing,
-    store as storeThing,
-} from '@/routes/things';
+import { add as addThing, store as storeThing } from '@/routes/things';
 import type {
     ThingCategoryOption,
     ThingFormData,
     ThingPlaceOption,
-} from './form-types';
+    ThingUnitOption,
+} from './types';
 
 function validateThing(data: ThingFormData): FormDataErrors<ThingFormData> {
     const errors: FormDataErrors<ThingFormData> = {};
@@ -48,15 +46,17 @@ function validateThing(data: ThingFormData): FormDataErrors<ThingFormData> {
 export default function AddThing({
     categories,
     places,
+    units,
 }: {
     categories: ThingCategoryOption[];
     places: ThingPlaceOption[];
+    units: ThingUnitOption[];
 }) {
     const form = useForm<ThingFormData>({
         name: '',
         category_id: null,
         quantity: 1,
-        unit: 'sztuka',
+        unit: units[0]?.value ?? '',
         placement: '',
         place_id: null,
         needs_packing: false,
@@ -91,7 +91,11 @@ export default function AddThing({
                 }}
                 className="space-y-5 sm:space-y-7"
             >
-                <BasicInformationStep form={form} categories={categories} />
+                <BasicInformationStep
+                    form={form}
+                    categories={categories}
+                    units={units}
+                />
 
                 <LocationStep form={form} places={places} />
 

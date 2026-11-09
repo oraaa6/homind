@@ -36,7 +36,12 @@ class StoreThingRequest extends FormRequest
             'category_id' => ['required', 'integer', Rule::exists('categories', 'id')],
             'placement' => ['nullable', 'string', 'max:5000'],
             'quantity' => ['required', 'integer', 'min:0'],
-            'unit' => ['required', 'string', 'max:50'],
+            'unit' => [
+                'required',
+                'string',
+                'max:50',
+                Rule::in(array_keys(config('thing-units', []))),
+            ],
             'needs_packing' => ['sometimes', 'boolean'],
         ];
     }
@@ -62,6 +67,7 @@ class StoreThingRequest extends FormRequest
             'quantity.integer' => 'Ilość musi być liczbą całkowitą.',
             'quantity.min' => 'Ilość nie może być ujemna.',
             'unit.required' => 'Wybierz jednostkę.',
+            'unit.in' => 'Wybierz jednostkę z listy.',
             'unit.max' => 'Jednostka może mieć maksymalnie 50 znaków.',
             'needs_packing.boolean' => 'Stan pakowania jest nieprawidłowy.',
         ];

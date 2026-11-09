@@ -1,3 +1,5 @@
+import type { InertiaFormProps } from '@inertiajs/react';
+
 export type Place = {
     id: string;
     slug: string;
@@ -14,8 +16,20 @@ export type Place = {
 };
 
 export type PlaceActivity = {
+    id: string;
     title: string;
+    description: string | null;
     date: string;
     author: string;
-    type: 'added' | 'moved' | 'created';
+    type: 'added' | 'moved' | 'created' | 'updated' | 'deleted';
 };
+
+export type PlaceFormData = {
+    household_id: number;
+    kind: Place['kind'];
+    name: string;
+    parent_id: number | null;
+    placement: string;
+};
+
+export type PlaceFormState = InertiaFormProps<PlaceFormData>;

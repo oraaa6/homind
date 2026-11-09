@@ -2,7 +2,8 @@ import { CheckOutlined, EnvironmentOutlined } from '@ant-design/icons';
 import { useForm } from '@inertiajs/react';
 import { Form, Input, Modal, Select } from 'antd';
 import Button from '@/components/Button';
-import type { Place } from '@/pages/places/data';
+import SurfaceBox from '@/components/surface-box';
+import type { Place } from '@/pages/places/types';
 import { update as updatePlace } from '@/routes/places';
 
 type RoomOption = {
@@ -71,7 +72,7 @@ export default function ChangePlaceLocationModal({
                 </div>
             }
         >
-            <div className="my-5 flex flex-wrap items-center gap-2 rounded-xl bg-tertiary p-4 text-sm text-(--button-text) sm:text-base">
+            <SurfaceBox className="my-5 flex flex-wrap items-center gap-2 text-sm text-(--button-text) sm:text-base">
                 <EnvironmentOutlined
                     className="text-primary"
                     aria-hidden="true"
@@ -81,7 +82,7 @@ export default function ChangePlaceLocationModal({
                     {parentName ?? 'Brak pomieszczenia'}
                     {place.description && ` · ${place.description}`}
                 </strong>
-            </div>
+            </SurfaceBox>
 
             <Form layout="vertical" onFinish={submit}>
                 <Form.Item

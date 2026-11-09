@@ -24,6 +24,7 @@ use Illuminate\Support\Carbon;
  * @property-read Place|null $parent
  * @property-read Collection<int, Place> $children
  * @property-read Collection<int, Thing> $things
+ * @property-read Collection<int, ActivityLog> $activityLogs
  */
 #[Fillable(['parent_id', 'kind', 'name', 'level', 'placement'])]
 class Place extends Model
@@ -89,5 +90,15 @@ class Place extends Model
     public function things(): HasMany
     {
         return $this->hasMany(Thing::class);
+    }
+
+    /**
+     * Activity records associated with this place.
+     *
+     * @return HasMany<ActivityLog, $this>
+     */
+    public function activityLogs(): HasMany
+    {
+        return $this->hasMany(ActivityLog::class);
     }
 }

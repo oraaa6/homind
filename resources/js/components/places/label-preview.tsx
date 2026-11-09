@@ -1,6 +1,6 @@
 import { HomeFilled } from '@ant-design/icons';
 import { QRCode } from 'antd';
-import type { Place } from '@/pages/places/data';
+import type { Place } from '@/pages/places/types';
 import { placeKinds } from './place-kinds';
 
 export default function LabelPreview({
@@ -42,9 +42,7 @@ export default function LabelPreview({
                             className="shrink-0"
                         />
                     </div>
-                    <div
-                        className="min-w-0 flex-1 basis-32 wrap-anywhere"
-                    >
+                    <div className="min-w-0 flex-1 basis-32 wrap-anywhere">
                         <p className="font-mono text-xl font-bold sm:text-2xl">
                             #{identifier}
                         </p>

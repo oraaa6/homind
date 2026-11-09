@@ -1,14 +1,17 @@
 import {
-    QrcodeOutlined,
     PrinterOutlined,
+    QrcodeOutlined,
     ReloadOutlined,
     ShareAltOutlined,
 } from '@ant-design/icons';
+import { useForm } from '@inertiajs/react';
 import { message } from 'antd';
 import Button from '@/components/Button';
 import SectionCard from '@/components/section-card';
+import SurfaceBox from '@/components/surface-box';
 import { usePrintPlaceLabel } from '@/hooks/use-print-place-label';
-import type { Place } from '@/pages/places/data';
+import type { Place } from '@/pages/places/types';
+import places from '@/routes/places';
 import LabelPreview from './label-preview';
 
 export default function PlaceLabelCard({
@@ -21,15 +24,11 @@ export default function PlaceLabelCard({
     url: string;
 }) {
     const printLabel = usePrintPlaceLabel(place.id, place.name);
+    const regenerateForm = useForm({});
 
     return (
-        <SectionCard
-            as="aside"
-            title="Fizyczny tag QR"
-            description="Etykieta samoprzylepna"
-            className="w-full min-w-0"
-        >
-            <div className="grid min-w-0 gap-5 lg:grid-cols-[minmax(0,1.2fr)_minmax(18rem,0.8fr)] lg:items-center lg:gap-8">
+        <SectionCard as="aside" title="Kod QR" className="w-full min-w-0">
+            <div className="grid min-w-0 gap-5 lg:grid-cols-[minmax(0,1.2fr)_minmax(18rem,0.8fr)] lg:gap-8">
                 <div className="min-w-0">
                     <LabelPreview
                         identifier={place.qrCode ?? place.id}
@@ -39,7 +38,7 @@ export default function PlaceLabelCard({
                         value={url}
                     />
                 </div>
-                <div className="flex min-w-0 flex-col gap-5 rounded-2xl bg-tertiary p-4 sm:p-6">
+                <SurfaceBox className="flex h-full flex-col justify-center gap-5">
                     <div className="flex items-start gap-3">
                         <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-surface-muted text-lg text-primary">
                             <QrcodeOutlined aria-hidden="true" />
@@ -65,20 +64,34 @@ export default function PlaceLabelCard({
                     </Button>
                     <div className="grid grid-cols-2 gap-2">
                         <Button
-                            type="secondary"
+                            type="ghost"
                             size="small"
                             icon={<ReloadOutlined />}
                             className="h-auto! min-h-9 py-2! whitespace-normal!"
+                            loading={regenerateForm.processing}
+                            disabled={regenerateForm.processing}
                             onClick={() =>
-                                message.info(
-                                    'Generowanie nowego kodu będzie dostępne po podłączeniu backendu.',
+                                regenerateForm.patch(
+                                    places.identifier.regenerate(place.slug)
+                                        .url,
+                                    {
+                                        preserveScroll: true,
+                                        onSuccess: () =>
+                                            message.success(
+                                                'Wygenerowano nowy kod etykiety.',
+                                            ),
+                                        onError: () =>
+                                            message.error(
+                                                'Nie udało się wygenerować nowego kodu.',
+                                            ),
+                                    },
                                 )
                             }
                         >
                             Nowy kod
                         </Button>
                         <Button
-                            type="secondary"
+                            type="ghost"
                             size="small"
                             icon={<ShareAltOutlined />}
                             className="h-auto! min-h-9 py-2! whitespace-normal!"
@@ -95,10 +108,10 @@ export default function PlaceLabelCard({
                                 }
                             }}
                         >
-                            Udostępnij
+                            Skopiuj link
                         </Button>
                     </div>
-                </div>
+                </SurfaceBox>
             </div>
         </SectionCard>
     );
