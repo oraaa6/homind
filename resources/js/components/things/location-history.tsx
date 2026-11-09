@@ -1,7 +1,7 @@
 import { Empty } from 'antd';
-import type { ActivityEntry } from '@/components/activity-list';
 import ActivityList from '@/components/activity-list';
 import SectionCard from '@/components/section-card';
+import type { ActivityEntry } from '@/types/activity';
 
 export default function LocationHistory({
     history,

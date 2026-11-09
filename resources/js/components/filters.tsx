@@ -2,6 +2,7 @@ import { Carousel, Input, Select } from 'antd';
 import clsx from 'clsx';
 import { useRef } from 'react';
 import Button from '@/components/Button';
+import type { SortOption, SortValue } from '@/hooks/use-list-controls';
 
 type FilterOption = {
     value: string;
@@ -17,9 +18,9 @@ type FiltersProps = {
     onSearchChange: (value: string) => void;
     onSearch: (value: string) => void;
     searchPlaceholder?: string;
-    sortOptions: { value: string; label: string }[];
-    sort: string;
-    onSortChange: (value: string) => void;
+    sortOptions: SortOption[];
+    sort: SortValue;
+    onSortChange: (value: SortValue) => void;
     variant?: 'default' | 'muted';
 };
 
@@ -56,7 +57,7 @@ export default function Filters({
                 className={clsx(
                     'min-w-0',
                     isMuted &&
-                        '[&_.ant-input-affix-wrapper]:bg-surface-muted! [&_.ant-input]:bg-transparent!',
+                        '[&_.ant-input]:bg-transparent! [&_.ant-input-affix-wrapper]:bg-surface-muted!',
                 )}
             />
 

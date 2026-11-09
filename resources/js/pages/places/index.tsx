@@ -9,6 +9,7 @@ import Statistics from '@/components/statistics';
 import useListControls, { listSortOptions } from '@/hooks/use-list-controls';
 import { places } from '@/routes';
 import { add as addPlace, show as showPlace } from '@/routes/places';
+import { PlaceType } from '@/types/place';
 import type { Place } from './types';
 
 export default function Places({
@@ -77,7 +78,8 @@ export default function Places({
         {
             label: 'Wszystkie strefy',
             value: String(
-                placesData.filter((place) => place.kind === 'room').length,
+                placesData.filter((place) => place.kind === PlaceType.Room)
+                    .length,
             ),
             icon: '/icons/zone.svg',
             description: 'Pomieszczenia i otoczenie domu',
@@ -86,7 +88,7 @@ export default function Places({
             label: 'Obiekty z kodem QR',
             value: String(
                 placesData.filter(
-                    (place) => place.kind !== 'room' && place.qrCode,
+                    (place) => place.kind !== PlaceType.Room && place.qrCode,
                 ).length,
             ),
             icon: '/icons/qr-box.svg',

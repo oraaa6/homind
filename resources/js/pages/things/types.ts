@@ -1,4 +1,5 @@
 import type { InertiaFormProps } from '@inertiajs/react';
+import type { PlaceType } from '@/types/place';
 
 export type Thing = {
     id: string;
@@ -6,7 +7,7 @@ export type Thing = {
     name: string;
     location: string;
     placeId: number;
-    placeKind: 'room' | 'rack' | 'box';
+    placeKind: PlaceType;
     storagePlaceName?: string | null;
     category: string;
     placement: string | null;
@@ -42,7 +43,7 @@ export type ThingFormState = InertiaFormProps<ThingFormData>;
 export type ThingPlaceOption = {
     id: number;
     name: string;
-    kind: 'room' | 'rack' | 'box';
+    kind: PlaceType;
     identifier: string | null;
     parent_name: string | null;
     household_name: string;

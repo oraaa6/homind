@@ -5,6 +5,7 @@ import { useState } from 'react';
 import Button from '@/components/Button';
 import SectionCard from '@/components/section-card';
 import type { ThingFormState, ThingPlaceOption } from '@/pages/things/types';
+import { PlaceType } from '@/types/place';
 
 function getPlaceFromQr(
     code: string,
@@ -72,9 +73,9 @@ export default function LocationStep({
             ...form.data,
             place_id: place.id,
             needs_packing:
-                place.kind === 'room' ? form.data.needs_packing : false,
+                place.kind === PlaceType.Room ? form.data.needs_packing : false,
             placement:
-                place.kind !== 'room' && form.data.needs_packing
+                place.kind !== PlaceType.Room && form.data.needs_packing
                     ? ''
                     : form.data.placement,
         });
@@ -108,8 +109,7 @@ export default function LocationStep({
                         >
                             <div className="flex flex-col gap-3 sm:flex-row">
                                 <Select
-                                    showSearch
-                                    optionFilterProp="label"
+                                    showSearch={{ optionFilterProp: 'label' }}
                                     size="large"
                                     className="min-w-0 flex-1"
                                     placeholder="Wybierz lokalizację"
@@ -125,11 +125,12 @@ export default function LocationStep({
                                             ...form.data,
                                             place_id: value,
                                             needs_packing:
-                                                place?.kind !== 'room'
+                                                place?.kind !== PlaceType.Room
                                                     ? false
                                                     : form.data.needs_packing,
                                             placement:
-                                                place?.kind !== 'room' &&
+                                                place?.kind !==
+                                                    PlaceType.Room &&
                                                 form.data.needs_packing
                                                     ? ''
                                                     : form.data.placement,
@@ -159,7 +160,9 @@ export default function LocationStep({
                         >
                             <Checkbox
                                 checked={form.data.needs_packing}
-                                disabled={selectedPlace?.kind !== 'room'}
+                                disabled={
+                                    selectedPlace?.kind !== PlaceType.Room
+                                }
                                 onChange={(event) => {
                                     form.setData({
                                         ...form.data,
@@ -174,14 +177,15 @@ export default function LocationStep({
                                 Dodaj do kolejki <strong>Do spakowania</strong>
                             </Checkbox>
                         </Form.Item>
-                        {selectedPlace && selectedPlace.kind !== 'room' && (
-                            <p className="-mt-3 mb-5 text-sm text-(--button-text)">
-                                „Do spakowania” można wybrać tylko dla
-                                przedmiotu przypisanego bezpośrednio do
-                                pomieszczenia.
-                            </p>
-                        )}
-                        {selectedPlace?.kind === 'room' &&
+                        {selectedPlace &&
+                            selectedPlace.kind !== PlaceType.Room && (
+                                <p className="-mt-3 mb-5 text-sm text-(--button-text)">
+                                    „Do spakowania” można wybrać tylko dla
+                                    przedmiotu przypisanego bezpośrednio do
+                                    pomieszczenia.
+                                </p>
+                            )}
+                        {selectedPlace?.kind === PlaceType.Room &&
                             !form.data.needs_packing && (
                                 <p className="-mt-3 mb-5 text-sm text-(--button-text)">
                                     Bez zaznaczenia pomieszczenie będzie

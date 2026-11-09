@@ -9,6 +9,7 @@ import Statistics from '@/components/statistics';
 import useListControls, { listSortOptions } from '@/hooks/use-list-controls';
 import { things } from '@/routes';
 import { add as addThing, show as showThing } from '@/routes/things';
+import { PlaceType } from '@/types/place';
 import type { Thing, ThingCategoryOption } from './types';
 
 export default function Things({
@@ -37,7 +38,8 @@ export default function Things({
         {
             label: 'W pomieszczeniach',
             value: String(
-                items.filter((item) => item.placeKind === 'room').length,
+                items.filter((item) => item.placeKind === PlaceType.Room)
+                    .length,
             ),
             icon: '/icons/zone.svg',
             description: 'Przypisane bezpośrednio do pomieszczeń',
@@ -45,7 +47,7 @@ export default function Things({
         {
             label: 'W pudełkach',
             value: String(
-                items.filter((item) => item.placeKind === 'box').length,
+                items.filter((item) => item.placeKind === PlaceType.Box).length,
             ),
             icon: '/icons/qr-box.svg',
             description: 'Przypisane do oznaczonych pojemników',
@@ -53,7 +55,8 @@ export default function Things({
         {
             label: 'Na regałach',
             value: String(
-                items.filter((item) => item.placeKind === 'rack').length,
+                items.filter((item) => item.placeKind === PlaceType.Rack)
+                    .length,
             ),
             icon: '/icons/catalog.svg',
             description: 'Przypisane do regałów lub mebli',

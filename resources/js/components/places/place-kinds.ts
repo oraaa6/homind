@@ -9,7 +9,7 @@ export const placeKinds = {
     rack: {
         label: 'Regał',
         title: 'Regał / Mebel',
-        description: 'Stała półka, szafa lub regał magazynowy z kodem QR.',
+        description: 'Stała półka, szafa lub regał magazynowy.',
         icon: AppstoreOutlined,
         prefix: 'RACK',
         labelType: 'REGAŁ',
@@ -17,7 +17,7 @@ export const placeKinds = {
     box: {
         label: 'Pudełko',
         title: 'Pudełko / Pojemnik',
-        description: 'Ruchomy karton, skrzynia plastikowa, organizer.',
+        description: 'Ruchomy karton, skrzynia plastikowa, organizer',
         icon: InboxOutlined,
         prefix: 'BOX',
         labelType: 'POJEMNIK',

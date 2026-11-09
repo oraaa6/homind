@@ -11,6 +11,7 @@ import SectionCard from '@/components/section-card';
 import { useFormValidation } from '@/hooks/use-form-validation';
 import { places } from '@/routes';
 import { add as addPlace, store as storePlace } from '@/routes/places';
+import { PlaceType } from '@/types/place';
 import type { PlaceFormData } from './types';
 
 function validatePlace(data: PlaceFormData): FormDataErrors<PlaceFormData> {
@@ -24,7 +25,7 @@ function validatePlace(data: PlaceFormData): FormDataErrors<PlaceFormData> {
         errors.household_id = 'Wybierz dom.';
     }
 
-    if (data.kind !== 'room' && !data.parent_id) {
+    if (data.kind !== PlaceType.Room && !data.parent_id) {
         errors.parent_id = 'Wybierz strefę nadrzędną lub pomieszczenie.';
     }
 
@@ -41,7 +42,7 @@ export default function AddPlace({
 }) {
     const form = useForm<PlaceFormData>({
         household_id: households[0]?.id ?? 0,
-        kind: 'room',
+        kind: PlaceType.Room,
         name: '',
         parent_id: null,
         placement: '',
@@ -78,7 +79,9 @@ export default function AddPlace({
                             ...form.data,
                             kind,
                             parent_id:
-                                kind === 'room' ? null : form.data.parent_id,
+                                kind === PlaceType.Room
+                                    ? null
+                                    : form.data.parent_id,
                         });
                         form.clearErrors('parent_id');
                     }}

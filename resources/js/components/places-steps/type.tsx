@@ -43,7 +43,7 @@ export default function TypeStep({
                                 key={kind}
                                 value={kind}
                                 className={clsx(
-                                    'relative m-0! flex! min-w-0 items-start! rounded-xl border border-transparent p-4! has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-primary sm:p-5! [&_.ant-radio]:sr-only [&>span:last-child]:w-full [&>span:last-child]:min-w-0 [&>span:last-child]:p-0!',
+                                    'relative m-0! flex! min-w-0 items-start! rounded-xl border border-transparent p-4! has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-primary sm:p-5! [&_.ant-radio]:sr-only [&>span:last-child]:w-full [&>span:last-child]:min-w-0 [&>span:last-child]:p-0!',
                                     selected
                                         ? 'border-primary! bg-primary-soft text-primary!'
                                         : 'bg-tertiary text-foreground!',

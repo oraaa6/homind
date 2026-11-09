@@ -7,7 +7,6 @@ import {
 import { Head, router, useForm } from '@inertiajs/react';
 import { Form, InputNumber, Modal, Popconfirm, message } from 'antd';
 import { useState } from 'react';
-import type { ActivityEntry } from '@/components/activity-list';
 import Button from '@/components/Button';
 import Heading from '@/components/heading';
 import SectionCard from '@/components/section-card';
@@ -18,6 +17,7 @@ import LocationHistory from '@/components/things/location-history';
 import { things } from '@/routes';
 import { destroy as destroyThing } from '@/routes/things';
 import { update as updateThingQuantity } from '@/routes/things/quantity';
+import type { ActivityEntry } from '@/types/activity';
 import type { Thing, ThingDetails, ThingPlaceOption } from './types';
 
 export default function ShowThing({

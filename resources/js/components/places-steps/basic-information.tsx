@@ -2,6 +2,7 @@ import { AppstoreOutlined, EnvironmentOutlined } from '@ant-design/icons';
 import { Alert, Form, Input, Select } from 'antd';
 import SectionCard from '@/components/section-card';
 import type { PlaceFormState } from '@/pages/places/types';
+import { PlaceType } from '@/types/place';
 
 type HouseholdOption = { id: number; name: string };
 export type RoomOption = {
@@ -19,7 +20,7 @@ export default function BasicInformationStep({
     households: HouseholdOption[];
     rooms: RoomOption[];
 }) {
-    const isRoom = form.data.kind === 'room';
+    const isRoom = form.data.kind === PlaceType.Room;
     const roomOptions = rooms
         .filter((room) => room.household_id === form.data.household_id)
         .map((room) => ({ value: room.id, label: room.name }));

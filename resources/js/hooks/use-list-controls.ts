@@ -1,9 +1,20 @@
 import { useState } from 'react';
 
-export const listSortOptions = [
-    { value: 'newest', label: 'Najnowsze' },
-    { value: 'oldest', label: 'Najstarsze' },
-    { value: 'name', label: 'Nazwa A–Z' },
+export enum SortValue {
+    Newest = 'newest',
+    Oldest = 'oldest',
+    Name = 'name',
+}
+
+export type SortOption = {
+    value: SortValue;
+    label: string;
+};
+
+export const listSortOptions: SortOption[] = [
+    { value: SortValue.Newest, label: 'Najnowsze' },
+    { value: SortValue.Oldest, label: 'Najstarsze' },
+    { value: SortValue.Name, label: 'Nazwa A–Z' },
 ];
 
 type SortableListItem = {
@@ -27,7 +38,7 @@ export default function useListControls<T extends SortableListItem>({
     const [filter, setFilter] = useState('all');
     const [searchInput, setSearchInput] = useState('');
     const [search, setSearch] = useState('');
-    const [sort, setSort] = useState('newest');
+    const [sort, setSort] = useState(SortValue.Newest);
     const [page, setPage] = useState(1);
     const query = search.trim().toLocaleLowerCase('pl');
 
@@ -38,11 +49,11 @@ export default function useListControls<T extends SortableListItem>({
                 getSearchText(item).toLocaleLowerCase('pl').includes(query),
         )
         .sort((first, second) => {
-            if (sort === 'name') {
+            if (sort === SortValue.Name) {
                 return first.name.localeCompare(second.name, 'pl');
             }
 
-            return sort === 'oldest'
+            return sort === SortValue.Oldest
                 ? first.createdAt.localeCompare(second.createdAt)
                 : second.createdAt.localeCompare(first.createdAt);
         });
@@ -66,7 +77,7 @@ export default function useListControls<T extends SortableListItem>({
             setSearch(value);
             setPage(1);
         },
-        onSortChange: (value: string) => {
+        onSortChange: (value: SortValue) => {
             setSort(value);
             setPage(1);
         },

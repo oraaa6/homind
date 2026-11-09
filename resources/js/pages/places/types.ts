@@ -1,10 +1,12 @@
 import type { InertiaFormProps } from '@inertiajs/react';
+import type { ActivityEntry } from '@/types/activity';
+import type { PlaceType } from '@/types/place';
 
 export type Place = {
     id: string;
     slug: string;
     name: string;
-    kind: 'room' | 'box' | 'rack';
+    kind: PlaceType;
     parentId: number | null;
     parentName?: string | null;
     qrCode: string | null;
@@ -15,14 +17,7 @@ export type Place = {
     thingCount: number;
 };
 
-export type PlaceActivity = {
-    id: string;
-    title: string;
-    description: string | null;
-    date: string;
-    author: string;
-    type: 'added' | 'moved' | 'created' | 'updated' | 'deleted';
-};
+export type PlaceActivity = ActivityEntry;
 
 export type PlaceFormData = {
     household_id: number;

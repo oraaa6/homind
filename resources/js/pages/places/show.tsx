@@ -18,6 +18,7 @@ import type { Thing } from '@/pages/things/types';
 import { places } from '@/routes';
 import { destroy as destroyPlace, show as showPlace } from '@/routes/places';
 import { add as addThing } from '@/routes/things';
+import { PlaceType } from '@/types/place';
 import type { Place, PlaceActivity } from './types';
 
 export default function ShowPlace({
@@ -104,7 +105,7 @@ export default function ShowPlace({
                     </Popconfirm>
                 }
                 secondaryButtonProps={
-                    place.kind !== 'room'
+                    place.kind !== PlaceType.Room
                         ? {
                               children: 'Zmień lokalizację',
                               icon: <EnvironmentOutlined />,
@@ -124,7 +125,7 @@ export default function ShowPlace({
                     items={statistics}
                 />
                 <div className="flex min-w-0 flex-col gap-5 lg:gap-7">
-                    {place.kind !== 'room' && place.qrCode && (
+                    {place.kind !== PlaceType.Room && place.qrCode && (
                         <div className="w-full min-w-0">
                             <PlaceLabelCard
                                 place={place}

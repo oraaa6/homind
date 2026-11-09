@@ -1,23 +1,15 @@
 import {
     DeleteOutlined,
     DownOutlined,
-    EnvironmentOutlined,
     EditOutlined,
+    EnvironmentOutlined,
     ExportOutlined,
     PlusCircleOutlined,
 } from '@ant-design/icons';
 import { router } from '@inertiajs/react';
 import { useState } from 'react';
 import Button from '@/components/Button';
-
-export type ActivityEntry = {
-    id: string;
-    title: string;
-    description: string | null;
-    date: string;
-    author: string;
-    type: 'added' | 'moved' | 'created' | 'updated' | 'deleted';
-};
+import type { ActivityEntry } from '@/types/activity';
 
 const activityIcons = {
     added: PlusCircleOutlined,
@@ -31,6 +23,8 @@ const dateFormatter = new Intl.DateTimeFormat('pl-PL', {
     dateStyle: 'short',
     timeStyle: 'short',
 });
+
+export type { ActivityEntry } from '@/types/activity';
 
 export default function ActivityList({
     entries,
