@@ -47,7 +47,11 @@ export default function ShowThing({
                 description={`#${item.id}`}
                 backLink={{
                     href: things().url,
-                    label: 'Wróć do listy przedmiotów',
+                    label: 'Wróć',
+                    onClick: (event) => {
+                        event.preventDefault();
+                        window.history.back();
+                    },
                 }}
                 primaryButtonProps={{
                     children: 'Zmień lokalizację',

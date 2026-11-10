@@ -71,7 +71,7 @@ export default function AddThing({
                 description="Zarejestruj fizyczny przedmiot w ewidencji domowej i przypisz jego stałe miejsce w przestrzeni."
                 backLink={{
                     href: things().url,
-                    label: 'Wróć do listy przedmiotów',
+                    label: 'Wróć',
                 }}
                 className="mb-8! sm:mb-10!"
             />

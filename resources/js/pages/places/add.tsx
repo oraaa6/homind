@@ -62,7 +62,7 @@ export default function AddPlace({
                 description="Zdefiniuj stałe miejsce składowania (strefa, regał, szafa) lub ruchomy pojemnik. Każdy obiekt może posiadać unikalny kod QR ułatwiający natychmiastowe odnajdywanie rzeczy skanerem."
                 backLink={{
                     href: places().url,
-                    label: 'Wróć do listy lokalizacji',
+                    label: 'Wróć',
                 }}
                 className="mb-8 sm:mb-10"
             />

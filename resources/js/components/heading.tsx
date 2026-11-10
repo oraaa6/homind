@@ -1,7 +1,7 @@
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import { Link } from '@inertiajs/react';
 import clsx from 'clsx';
-import type { ComponentProps, ReactNode } from 'react';
+import type { ComponentProps, MouseEvent, ReactNode } from 'react';
 import Button from '@/components/Button';
 
 type HeadingButtonProps = Omit<ComponentProps<typeof Button>, 'type'>;
@@ -22,7 +22,11 @@ export default function Heading({
     secondaryButtonProps?: HeadingButtonProps;
     primaryButtonProps?: HeadingButtonProps;
     actions?: ReactNode;
-    backLink?: { href: string; label: string };
+    backLink?: {
+        href: string;
+        label: string;
+        onClick?: (event: MouseEvent) => void;
+    };
     className?: string;
 }) {
     return (
@@ -37,6 +41,7 @@ export default function Heading({
                 {backLink && (
                     <Link
                         href={backLink.href}
+                        onClick={backLink.onClick}
                         className="mb-5 inline-flex items-center gap-2 text-sm font-medium text-(--button-text) hover:text-primary sm:mb-7 sm:text-base"
                     >
                         <ArrowLeftOutlined aria-hidden="true" />

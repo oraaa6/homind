@@ -1,8 +1,4 @@
-import {
-    DeleteOutlined,
-    EnvironmentOutlined,
-    PlusOutlined,
-} from '@ant-design/icons';
+import { DeleteOutlined, EnvironmentOutlined } from '@ant-design/icons';
 import { Head, router } from '@inertiajs/react';
 import { message, Popconfirm } from 'antd';
 import { useState } from 'react';
@@ -17,7 +13,6 @@ import Statistics from '@/components/statistics';
 import type { Thing } from '@/pages/things/types';
 import { places } from '@/routes';
 import { destroy as destroyPlace, show as showPlace } from '@/routes/places';
-import { add as addThing } from '@/routes/things';
 import { PlaceType } from '@/types/place';
 import type { Place, PlaceActivity } from './types';
 
@@ -71,7 +66,7 @@ export default function ShowPlace({
                 description={`${place.qrCode ? `#${place.id} · ` : ''}${placeKinds[place.kind].label} · ${room}`}
                 backLink={{
                     href: places().url,
-                    label: 'Wróć do listy lokalizacji',
+                    label: 'Wróć',
                 }}
                 actions={
                     <Popconfirm
@@ -104,7 +99,7 @@ export default function ShowPlace({
                         </Button>
                     </Popconfirm>
                 }
-                secondaryButtonProps={
+                primaryButtonProps={
                     place.kind !== PlaceType.Room
                         ? {
                               children: 'Zmień lokalizację',
@@ -113,11 +108,6 @@ export default function ShowPlace({
                           }
                         : undefined
                 }
-                primaryButtonProps={{
-                    children: 'Dodaj przedmiot',
-                    icon: <PlusOutlined />,
-                    onClick: () => router.visit(addThing().url),
-                }}
             />
             <div className="flex min-w-0 flex-col gap-5 sm:gap-7">
                 <Statistics
