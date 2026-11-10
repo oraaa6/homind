@@ -1,6 +1,15 @@
 import { PlusOutlined } from '@ant-design/icons';
 import { useForm } from '@inertiajs/react';
-import { Form, Input, InputNumber, message, Modal, Select, Tag } from 'antd';
+import {
+    Checkbox,
+    Form,
+    Input,
+    InputNumber,
+    message,
+    Modal,
+    Select,
+    Tag,
+} from 'antd';
 import { useState } from 'react';
 import Button from '@/components/Button';
 import SectionCard from '@/components/section-card';
@@ -126,6 +135,23 @@ export default function BasicInformationStep({
                             onClick={() => setCategoryModalOpen(true)}
                         />
                     </div>
+                </Form.Item>
+
+                <Form.Item className="mb-0!">
+                    <Checkbox
+                        checked={form.data.requires_maintenance}
+                        onChange={(event) =>
+                            form.setData(
+                                'requires_maintenance',
+                                event.target.checked,
+                            )
+                        }
+                    >
+                        To urządzenie wymaga serwisowania
+                    </Checkbox>
+                    <p className="mt-1 ml-6 text-sm text-(--button-text)">
+                        Pojawi się na liście urządzeń przy dodawaniu serwisu.
+                    </p>
                 </Form.Item>
 
                 <div className="mt-6! grid grid-cols-1 gap-4 sm:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]">

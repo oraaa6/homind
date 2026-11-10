@@ -151,7 +151,7 @@ export default function BaseLayout({ children }: AppLayoutProps) {
             )}
             <Layout>
                 <Content>
-                    <div className="mx-auto w-full px-[1rem] py-[1rem] md:px-[1.5rem]">
+                    <div className="mx-auto w-full px-[1rem] py-[1rem] md:px-[1.5rem] lg:py-[2.5rem]">
                         {children}
                     </div>
                 </Content>

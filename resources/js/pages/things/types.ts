@@ -15,6 +15,7 @@ export type Thing = {
     unit: string;
     unitShort: string;
     needsPacking: boolean;
+    requiresMaintenance: boolean;
     createdAt: string;
 };
 
@@ -36,6 +37,7 @@ export type ThingFormData = {
     placement: string;
     place_id: number | null;
     needs_packing: boolean;
+    requires_maintenance: boolean;
 };
 
 export type ThingFormState = InertiaFormProps<ThingFormData>;

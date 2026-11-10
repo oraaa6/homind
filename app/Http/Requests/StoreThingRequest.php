@@ -43,6 +43,7 @@ class StoreThingRequest extends FormRequest
                 Rule::in(array_keys(config('thing-units', []))),
             ],
             'needs_packing' => ['sometimes', 'boolean'],
+            'requires_maintenance' => ['sometimes', 'boolean'],
         ];
     }
 

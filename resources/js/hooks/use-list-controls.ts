@@ -26,6 +26,8 @@ type UseListControlsOptions<T extends SortableListItem> = {
     items: T[];
     getFilterValue: (item: T) => string;
     getSearchText: (item: T) => string;
+    getSortValue?: (item: T) => string;
+    initialSort?: SortValue;
     pageSize: number;
 };
 
@@ -33,12 +35,14 @@ export default function useListControls<T extends SortableListItem>({
     items,
     getFilterValue,
     getSearchText,
+    getSortValue,
+    initialSort = SortValue.Newest,
     pageSize,
 }: UseListControlsOptions<T>) {
     const [filter, setFilter] = useState('all');
     const [searchInput, setSearchInput] = useState('');
     const [search, setSearch] = useState('');
-    const [sort, setSort] = useState(SortValue.Newest);
+    const [sort, setSort] = useState(initialSort);
     const [page, setPage] = useState(1);
     const query = search.trim().toLocaleLowerCase('pl');
 
@@ -53,9 +57,12 @@ export default function useListControls<T extends SortableListItem>({
                 return first.name.localeCompare(second.name, 'pl');
             }
 
+            const firstSortValue = getSortValue?.(first) ?? first.createdAt;
+            const secondSortValue = getSortValue?.(second) ?? second.createdAt;
+
             return sort === SortValue.Oldest
-                ? first.createdAt.localeCompare(second.createdAt)
-                : second.createdAt.localeCompare(first.createdAt);
+                ? firstSortValue.localeCompare(secondSortValue)
+                : secondSortValue.localeCompare(firstSortValue);
         });
 
     return {

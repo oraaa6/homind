@@ -18,13 +18,14 @@ use Illuminate\Support\Carbon;
  * @property int $quantity
  * @property string $unit
  * @property bool $needs_packing
+ * @property bool $requires_maintenance
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property-read Place $place
  * @property-read Category $category
  * @property-read Collection<int, ActivityLog> $activityLogs
  */
-#[Fillable(['place_id', 'category_id', 'name', 'placement', 'quantity', 'unit', 'needs_packing'])]
+#[Fillable(['place_id', 'category_id', 'name', 'placement', 'quantity', 'unit', 'needs_packing', 'requires_maintenance'])]
 class Thing extends Model
 {
     /**
@@ -64,6 +65,7 @@ class Thing extends Model
     {
         return [
             'needs_packing' => 'boolean',
+            'requires_maintenance' => 'boolean',
         ];
     }
 }

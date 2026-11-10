@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\HouseholdController;
+use App\Http\Controllers\MaintenanceController;
 use App\Http\Controllers\PlaceController;
 use App\Http\Controllers\ThingController;
 use Illuminate\Support\Facades\Route;
@@ -15,6 +16,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('categories', [CategoryController::class, 'store'])->name('categories.store');
 
     Route::inertia('to-do', 'to-do/index')->name('to-do');
+    Route::get('maintenance', [MaintenanceController::class, 'index'])->name('maintenance');
+    Route::get('maintenance/add', [MaintenanceController::class, 'create'])->name('maintenance.add');
+    Route::get('maintenance/{thing}', [MaintenanceController::class, 'show'])->name('maintenance.show');
 
     Route::get('things', [ThingController::class, 'index'])->name('things');
     Route::get('things/add', [ThingController::class, 'create'])->name('things.add');

@@ -60,6 +60,7 @@ export default function AddThing({
         placement: '',
         place_id: null,
         needs_packing: false,
+        requires_maintenance: false,
     });
     const validate = useFormValidation(form, validateThing);
 

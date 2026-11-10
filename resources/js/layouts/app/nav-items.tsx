@@ -14,7 +14,7 @@ import {
 } from '@ant-design/icons';
 import { Link, router } from '@inertiajs/react';
 import type { MenuProps } from 'antd';
-import { dashboard, logout, places, things, toDo } from '@/routes';
+import { dashboard, logout, maintenance, places, things, toDo } from '@/routes';
 import { settings as householdSettings } from '@/routes/households';
 import { edit as editProfile } from '@/routes/profile';
 
@@ -55,9 +55,9 @@ export function getNavItems(): NavItems {
                     label: <Link href={places()}>Lokalizacje</Link>,
                 },
                 {
-                    key: 'maintenance',
+                    key: maintenance.url(),
                     icon: <ToolOutlined />,
-                    label: 'Utrzymanie',
+                    label: <Link href={maintenance()}>Utrzymanie</Link>,
                 },
                 { key: 'routines', icon: <QrcodeOutlined />, label: 'Rutyny' },
             ],

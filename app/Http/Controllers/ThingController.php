@@ -83,6 +83,7 @@ class ThingController extends Controller
                 'quantity' => $validated['quantity'],
                 'unit' => $validated['unit'],
                 'needs_packing' => $validated['needs_packing'] ?? false,
+                'requires_maintenance' => $validated['requires_maintenance'] ?? false,
             ]);
 
             $activityLogger->log(
@@ -333,6 +334,7 @@ class ThingController extends Controller
             'unit' => $thing->unit,
             'unitShort' => $this->unitShortLabel($thing->unit),
             'needsPacking' => $thing->needs_packing,
+            'requiresMaintenance' => $thing->requires_maintenance,
             'createdAt' => $thing->created_at?->toDateString() ?? '',
         ];
     }
