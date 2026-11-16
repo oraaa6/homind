@@ -18,7 +18,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::inertia('to-do', 'to-do/index')->name('to-do');
     Route::get('maintenance', [MaintenanceController::class, 'index'])->name('maintenance');
     Route::get('maintenance/add', [MaintenanceController::class, 'create'])->name('maintenance.add');
-    Route::get('maintenance/{thing}', [MaintenanceController::class, 'show'])->name('maintenance.show');
+    Route::get('maintenance/{thing}', [MaintenanceController::class, 'show'])->whereNumber('thing')->name('maintenance.show');
+    Route::post('maintenance/services', [MaintenanceController::class, 'store'])->name('maintenance.services.store');
+    Route::put('maintenance/services/{service}', [MaintenanceController::class, 'update'])->whereNumber('service')->name('maintenance.services.update');
+    Route::delete('maintenance/services/{service}', [MaintenanceController::class, 'destroy'])->whereNumber('service')->name('maintenance.services.destroy');
+    Route::post('maintenance/services/{service}/visits', [MaintenanceController::class, 'storeVisit'])->whereNumber('service')->name('maintenance.services.visits.store');
 
     Route::get('things', [ThingController::class, 'index'])->name('things');
     Route::get('things/add', [ThingController::class, 'create'])->name('things.add');

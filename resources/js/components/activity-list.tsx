@@ -5,6 +5,7 @@ import {
     EnvironmentOutlined,
     ExportOutlined,
     PlusCircleOutlined,
+    CheckCircleOutlined,
 } from '@ant-design/icons';
 import { router } from '@inertiajs/react';
 import { useState } from 'react';
@@ -17,6 +18,7 @@ const activityIcons = {
     created: EnvironmentOutlined,
     updated: EditOutlined,
     deleted: DeleteOutlined,
+    completed: CheckCircleOutlined,
 };
 
 const dateFormatter = new Intl.DateTimeFormat('pl-PL', {
@@ -59,7 +61,7 @@ export default function ActivityList({
                                     {entry.title}
                                 </p>
                                 {entry.description && (
-                                    <p className="mt-1 text-sm wrap-break-word text-(--button-text)">
+                                    <p className="mt-1 text-sm wrap-break-word whitespace-pre-line text-(--button-text)">
                                         {entry.description}
                                     </p>
                                 )}
@@ -68,8 +70,8 @@ export default function ActivityList({
                                         {dateFormatter.format(
                                             new Date(entry.date),
                                         )}
-                                    </time>{' '}
-                                    przez {entry.author}
+                                    </time>
+                                    {entry.author && ` przez ${entry.author}`}
                                 </p>
                             </div>
                         </li>

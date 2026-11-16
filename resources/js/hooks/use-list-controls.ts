@@ -4,6 +4,8 @@ export enum SortValue {
     Newest = 'newest',
     Oldest = 'oldest',
     Name = 'name',
+    EarliestDate = 'earliest-date',
+    LatestDate = 'latest-date',
 }
 
 export type SortOption = {
@@ -26,7 +28,7 @@ type UseListControlsOptions<T extends SortableListItem> = {
     items: T[];
     getFilterValue: (item: T) => string;
     getSearchText: (item: T) => string;
-    getSortValue?: (item: T) => string;
+    getSortValue?: (item: T) => string | null;
     initialSort?: SortValue;
     pageSize: number;
 };
@@ -55,6 +57,26 @@ export default function useListControls<T extends SortableListItem>({
         .sort((first, second) => {
             if (sort === SortValue.Name) {
                 return first.name.localeCompare(second.name, 'pl');
+            }
+
+            if (
+                sort === SortValue.EarliestDate ||
+                sort === SortValue.LatestDate
+            ) {
+                const firstValue = getSortValue?.(first) ?? null;
+                const secondValue = getSortValue?.(second) ?? null;
+
+                if (firstValue === null) {
+                    return secondValue === null ? 0 : 1;
+                }
+
+                if (secondValue === null) {
+                    return -1;
+                }
+
+                return sort === SortValue.EarliestDate
+                    ? firstValue.localeCompare(secondValue)
+                    : secondValue.localeCompare(firstValue);
             }
 
             const firstSortValue = getSortValue?.(first) ?? first.createdAt;

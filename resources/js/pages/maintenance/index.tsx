@@ -1,10 +1,6 @@
-import {
-    EditOutlined,
-    EnvironmentOutlined,
-    PlusOutlined,
-} from '@ant-design/icons';
-import { Head } from '@inertiajs/react';
-import { Tag } from 'antd';
+import { PlusOutlined } from '@ant-design/icons';
+import { Head, Link } from '@inertiajs/react';
+import { Alert, Tag } from 'antd';
 import Button from '@/components/Button';
 import Filters from '@/components/filters';
 import Heading from '@/components/heading';
@@ -12,93 +8,92 @@ import ItemsTable from '@/components/items-table';
 import Statistics from '@/components/statistics';
 import useListControls, {
     SortValue,
-    type SortOption,
 } from '@/hooks/use-list-controls';
-import { maintenance } from '@/routes';
+import type { SortOption } from '@/hooks/use-list-controls';
+import { maintenance, things } from '@/routes';
 import {
     add as addMaintenance,
     show as showMaintenance,
 } from '@/routes/maintenance';
+import type { MaintenanceIndexDevice, MaintenanceService } from './types';
+import {
+    formatMaintenanceDate,
+    getMaintenanceStatistics,
+    getMaintenanceStatus,
+    maintenanceStatusColors,
+} from './utils';
 
-type MaintenanceDevice = {
-    id: number;
-    name: string;
-    category: string;
-    location: string;
-    createdAt: string;
-    service: {
-        isScheduled: boolean;
-        appointmentAt: string | null;
-    } | null;
-};
-
-const statusTag = (isScheduled: boolean) => (
-    <Tag
-        color={isScheduled ? 'green' : 'default'}
-        className="m-0! rounded-full! px-3! py-1! font-semibold!"
-    >
-        {isScheduled ? 'Umówione' : 'Brak terminu'}
-    </Tag>
-);
-
-const formatAppointment = (value: string) =>
-    new Intl.DateTimeFormat('pl-PL', {
-        dateStyle: 'medium',
-        timeStyle: 'short',
-    }).format(new Date(value));
-
-const sortOptions: SortOption[] = [
-    { value: SortValue.Name, label: 'Nazwa A–Z' },
-    { value: SortValue.Newest, label: 'Dodane najnowsze' },
-    { value: SortValue.Oldest, label: 'Dodane najstarsze' },
+const maintenanceSortOptions: SortOption[] = [
+    { value: SortValue.EarliestDate, label: 'Najbliższy' },
+    { value: SortValue.LatestDate, label: 'Najdalszy' },
 ];
+
+const statusTag = (service: MaintenanceService | null) => {
+    const status = getMaintenanceStatus(service);
+
+    return (
+        <Tag
+            color={maintenanceStatusColors[status]}
+            className="m-0! rounded-full! px-3! py-1! font-semibold!"
+        >
+            {status}
+        </Tag>
+    );
+};
 
 export default function Maintenance({
     devices,
 }: {
-    devices: MaintenanceDevice[];
+    devices: MaintenanceIndexDevice[];
 }) {
     const controls = useListControls({
         items: devices,
         getFilterValue: (device) => device.category,
-        getSearchText: (device) =>
-            `${device.name} ${device.category} ${device.location}`,
+        getSearchText: (device) => `${device.name} ${device.category}`,
+        getSortValue: (device) =>
+            device.service?.appointmentAt ?? device.service?.dueAt ?? null,
         initialSort: SortValue.Name,
         pageSize: 4,
     });
 
-    const categories = Array.from(
-        new Set(devices.map((device) => device.category)),
+    const categoryCounts = devices.reduce<Record<string, number>>(
+        (counts, device) => {
+            counts[device.category] = (counts[device.category] ?? 0) + 1;
+            return counts;
+        },
+        {},
     );
     const filters = [
-        { value: 'all', label: 'Wszystkie' },
-        ...categories.map((category) => ({ value: category, label: category })),
-    ].map((option) => ({
-        ...option,
-        count: devices.filter(
-            (device) =>
-                option.value === 'all' || device.category === option.value,
-        ).length,
-    }));
+        { value: 'all', label: 'Wszystkie', count: devices.length },
+        ...Object.entries(categoryCounts).map(([category, count]) => ({
+            value: category,
+            label: category,
+            count,
+        })),
+    ];
+
+    const { plannedThisYear, urgent, upcoming } = getMaintenanceStatistics(
+        devices.flatMap((device) => device.services),
+    );
 
     const statistics = [
         {
             label: 'Planowane serwisy',
-            value: '0',
+            value: String(plannedThisYear),
             icon: '/icons/wrench.svg',
-            description: 'W tym roku',
+            description: 'Umówione w tym roku',
         },
         {
             label: 'Pilne interwencje',
-            value: '0',
+            value: String(urgent),
             icon: '/icons/bolt.svg',
-            description: 'Brak zapisanych terminów',
+            description: 'Wymagają szybkiej reakcji',
         },
         {
             label: 'Zbliżające się terminy',
-            value: '0',
+            value: String(upcoming),
             icon: '/icons/trend-down.svg',
-            description: 'Brak zapisanych terminów',
+            description: 'Termin za 8–29 dni',
         },
     ];
 
@@ -106,23 +101,26 @@ export default function Maintenance({
         id: device.id,
         title: device.name,
         description: (
-            <div className="flex min-w-0 flex-col items-start gap-1">
-                <Tag className="m-0! rounded-md! bg-surface-muted! px-2! py-0.5! text-xs! font-semibold! text-(--button-text)!">
-                    {device.category}
-                </Tag>
-                <span className="flex min-w-0 flex-wrap items-center gap-x-1.5 gap-y-1">
-                    <EnvironmentOutlined aria-hidden="true" />
-                    <span>{device.location}</span>
-                </span>
-            </div>
+            <Tag className="m-0! rounded-md! bg-surface-muted! px-2! py-0.5! text-xs! font-semibold! text-(--button-text)!">
+                {device.category}
+            </Tag>
         ),
-        value: device.service?.appointmentAt
-            ? formatAppointment(device.service.appointmentAt)
-            : undefined,
+        value:
+            device.service?.appointmentAt || device.service?.dueAt ? (
+                <span className="text-sm! font-medium! whitespace-nowrap">
+                    {formatMaintenanceDate(
+                        (device.service.appointmentAt ?? device.service.dueAt)!,
+                        Boolean(device.service.appointmentAt),
+                        'medium',
+                    )}
+                </span>
+            ) : undefined,
         secondaryValue: device.service?.appointmentAt
             ? 'Termin wizyty'
-            : undefined,
-        status: statusTag(Boolean(device.service?.isScheduled)),
+            : device.service?.dueAt
+              ? 'Umówić do'
+              : undefined,
+        status: statusTag(device.service),
         actions: (
             <div className="flex flex-nowrap items-center justify-end gap-2">
                 <Button
@@ -132,35 +130,19 @@ export default function Maintenance({
                 >
                     Szczegóły
                 </Button>
-                {device.service ? (
-                    <Button
-                        href={
-                            addMaintenance({
-                                query: { thing_id: device.id, edit: 1 },
-                            }).url
-                        }
-                        type="primary"
-                        size="small"
-                        icon={<EditOutlined />}
-                        shape="circle"
-                        aria-label={`Edytuj serwis: ${device.name}`}
-                        title="Edytuj serwis"
-                    />
-                ) : (
-                    <Button
-                        href={
-                            addMaintenance({
-                                query: { thing_id: device.id },
-                            }).url
-                        }
-                        type="primary"
-                        size="small"
-                        icon={<PlusOutlined />}
-                        shape="circle"
-                        aria-label={`Dodaj serwis: ${device.name}`}
-                        title="Dodaj serwis"
-                    />
-                )}
+                <Button
+                    href={
+                        addMaintenance({
+                            query: { thing_id: device.id },
+                        }).url
+                    }
+                    type="primary"
+                    size="small"
+                    icon={<PlusOutlined />}
+                    shape="circle"
+                    aria-label={`Dodaj plan serwisu: ${device.name}`}
+                    title="Dodaj plan serwisu"
+                />
             </div>
         ),
     }));
@@ -173,6 +155,19 @@ export default function Maintenance({
                     title="Utrzymanie"
                     description="Serwisy i przeglądy urządzeń wymagające umówienia fachowca."
                 />
+                <Alert
+                    type="info"
+                    showIcon
+                    closable
+                    title={
+                        <>
+                            Aby sprzęt pojawił się na tej liście, dodaj go w
+                            zakładce <Link href={things().url}>Przedmioty</Link>{' '}
+                            i zaznacz opcję „Wymaga serwisowania”.
+                        </>
+                    }
+                    className="py-2!"
+                />
                 <Statistics items={statistics} />
                 <Filters
                     options={filters}
@@ -182,12 +177,13 @@ export default function Maintenance({
                     onSearchChange={controls.onSearchInputChange}
                     onSearch={controls.onSearch}
                     searchPlaceholder="Szukaj urządzeń..."
-                    sortOptions={sortOptions}
+                    sortOptions={maintenanceSortOptions}
                     sort={controls.sort}
                     onSortChange={controls.onSortChange}
                 />
                 <ItemsTable
                     items={tableItems}
+                    valueColumnWidth={184}
                     actionsColumnWidth={160}
                     pagination={{
                         current: controls.pagination.current,
