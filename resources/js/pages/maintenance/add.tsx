@@ -76,7 +76,7 @@ export default function AddMaintenance({
                 description={
                     service
                         ? 'Zmień dane zaplanowanego serwisu urządzenia.'
-                        : 'Zaplanuj przegląd techniczny, wpisz dane wykonawcy lub zarejestruj wykonaną naprawę instalacji.'
+                        : 'Zaplanuj serwis urządzenia, określ termin i uzupełnij dane wykonawcy.'
                 }
                 backLink={{
                     href: returnUrl,

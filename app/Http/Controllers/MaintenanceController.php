@@ -149,19 +149,21 @@ class MaintenanceController extends Controller
         $record = $this->accessibleServicesQuery($request)
             ->with('thing.place.household')
             ->findOrFail($service);
+
+        if (! $record->appointment_at) {
+            throw ValidationException::withMessages([
+                'performed_at' => 'Możesz potwierdzić wykonanie tylko umówionego serwisu.',
+            ]);
+        }
+
         $data = $request->validated();
-        abort_if(
-            $record->recurrence_months === null
-                && $record->due_at === null
-                && $record->appointment_at === null
-                && $record->visits()->exists(),
-            409,
-        );
 
         DB::transaction(function () use ($record, $data, $request) {
             $visit = $record->visits()->create([
                 ...$data,
                 'user_id' => $request->user()->id,
+                'provider' => $record->provider,
+                'phone' => $record->phone,
             ]);
 
             if ($record->recurrence_months) {
@@ -277,8 +279,8 @@ class MaintenanceController extends Controller
                             : (float) $visit->actual_cost,
                         'notes' => $visit->notes,
                         'performedBy' => $visit->user?->name,
-                        'provider' => $service->provider,
-                        'phone' => $service->phone,
+                        'provider' => $visit->provider,
+                        'phone' => $visit->phone,
                     ])
                     ->values()
                 : [],

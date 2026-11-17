@@ -52,7 +52,7 @@ export default function Maintenance({
         getSearchText: (device) => `${device.name} ${device.category}`,
         getSortValue: (device) =>
             device.service?.appointmentAt ?? device.service?.dueAt ?? null,
-        initialSort: SortValue.Name,
+        initialSort: SortValue.EarliestDate,
         pageSize: 4,
     });
 

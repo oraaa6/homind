@@ -99,7 +99,8 @@ export function getMaintenanceStatistics(
             if (
                 service.isScheduled &&
                 service.appointmentAt &&
-                new Date(service.appointmentAt).getFullYear() === year
+                new Date(service.appointmentAt).getFullYear() === year &&
+                getDaysUntilMaintenanceDate(service.appointmentAt, now) >= 0
             ) {
                 counts.plannedThisYear += 1;
             }

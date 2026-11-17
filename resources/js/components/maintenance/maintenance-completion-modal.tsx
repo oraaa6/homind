@@ -103,6 +103,7 @@ export default function MaintenanceCompletionModal({
                     <DatePicker
                         size="large"
                         format="DD.MM.YYYY"
+                        disabledDate={(current) => current.isAfter(dayjs(), 'day')}
                         className="w-full! bg-tertiary!"
                     />
                 </Form.Item>

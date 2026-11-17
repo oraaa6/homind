@@ -22,7 +22,7 @@ export default function ScheduleStep({
     return (
         <SectionCard
             number="02"
-            title="Termin i status realizacji"
+            title="Termin i cykliczność"
             className="xl:p-9"
         >
             <Form.Item

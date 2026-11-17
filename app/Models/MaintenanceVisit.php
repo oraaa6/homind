@@ -12,6 +12,8 @@ use Illuminate\Support\Carbon;
  * @property int $maintenance_service_id
  * @property int|null $user_id
  * @property Carbon $performed_at
+ * @property string|null $provider
+ * @property string|null $phone
  * @property string|null $actual_cost
  * @property string|null $notes
  * @property-read MaintenanceService $maintenanceService
@@ -21,6 +23,8 @@ use Illuminate\Support\Carbon;
     'maintenance_service_id',
     'user_id',
     'performed_at',
+    'provider',
+    'phone',
     'actual_cost',
     'notes',
 ])]
