@@ -7,14 +7,22 @@ import {
     FileTextOutlined,
     HomeOutlined,
     LogoutOutlined,
-    QrcodeOutlined,
+    RetweetOutlined,
     ShoppingCartOutlined,
     ToolOutlined,
     UserOutlined,
 } from '@ant-design/icons';
 import { Link, router } from '@inertiajs/react';
 import type { MenuProps } from 'antd';
-import { dashboard, logout, maintenance, places, things, toDo } from '@/routes';
+import {
+    dashboard,
+    logout,
+    maintenance,
+    places,
+    routines,
+    things,
+    toDo,
+} from '@/routes';
 import { settings as householdSettings } from '@/routes/households';
 import { edit as editProfile } from '@/routes/profile';
 
@@ -59,7 +67,11 @@ export function getNavItems(): NavItems {
                     icon: <ToolOutlined />,
                     label: <Link href={maintenance()}>Utrzymanie</Link>,
                 },
-                { key: 'routines', icon: <QrcodeOutlined />, label: 'Rutyny' },
+                {
+                    key: routines.url(),
+                    icon: <RetweetOutlined />,
+                    label: <Link href={routines()}>Rutyny</Link>,
+                },
             ],
         },
         {

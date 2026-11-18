@@ -6,9 +6,15 @@ import {
     ExportOutlined,
     PlusCircleOutlined,
     CheckCircleOutlined,
+    ForwardOutlined,
+    PauseCircleOutlined,
+    PlayCircleOutlined,
+    InboxOutlined,
+    UndoOutlined,
 } from '@ant-design/icons';
 import { router } from '@inertiajs/react';
 import { useState } from 'react';
+import type { ReactNode } from 'react';
 import Button from '@/components/Button';
 import type { ActivityEntry } from '@/types/activity';
 
@@ -19,6 +25,11 @@ const activityIcons = {
     updated: EditOutlined,
     deleted: DeleteOutlined,
     completed: CheckCircleOutlined,
+    skipped: ForwardOutlined,
+    paused: PauseCircleOutlined,
+    resumed: PlayCircleOutlined,
+    archived: InboxOutlined,
+    restored: UndoOutlined,
 };
 
 const dateFormatter = new Intl.DateTimeFormat('pl-PL', {
@@ -26,14 +37,22 @@ const dateFormatter = new Intl.DateTimeFormat('pl-PL', {
     timeStyle: 'short',
 });
 
+const dateOnlyFormatter = new Intl.DateTimeFormat('pl-PL', {
+    dateStyle: 'short',
+});
+
 export type { ActivityEntry } from '@/types/activity';
 
 export default function ActivityList({
     entries,
     hasMore,
+    dateOnly = false,
+    renderActions,
 }: {
     entries: ActivityEntry[];
     hasMore: boolean;
+    dateOnly?: boolean;
+    renderActions?: (entry: ActivityEntry) => ReactNode;
 }) {
     const [loading, setLoading] = useState(false);
 
@@ -57,9 +76,16 @@ export default function ActivityList({
                                 </span>
                             </div>
                             <div className="min-w-0 flex-1 pt-1">
-                                <p className="text-sm font-medium wrap-break-word text-foreground sm:text-base">
-                                    {entry.title}
-                                </p>
+                                <div className="flex items-start justify-between gap-3">
+                                    <p className="min-w-0 flex-1 text-sm font-medium wrap-break-word text-foreground sm:text-base">
+                                        {entry.title}
+                                    </p>
+                                    {renderActions && (
+                                        <div className="shrink-0">
+                                            {renderActions(entry)}
+                                        </div>
+                                    )}
+                                </div>
                                 {entry.description && (
                                     <p className="mt-1 text-sm wrap-break-word whitespace-pre-line text-(--button-text)">
                                         {entry.description}
@@ -67,8 +93,17 @@ export default function ActivityList({
                                 )}
                                 <p className="mt-1 text-xs text-(--button-text)">
                                     <time dateTime={entry.date}>
-                                        {dateFormatter.format(
-                                            new Date(entry.date),
+                                        {entry.dateLabel &&
+                                            `${entry.dateLabel}: `}
+                                        {(dateOnly
+                                            ? dateOnlyFormatter
+                                            : dateFormatter
+                                        ).format(
+                                            new Date(
+                                                entry.date.length === 10
+                                                    ? `${entry.date}T00:00:00`
+                                                    : entry.date,
+                                            ),
                                         )}
                                     </time>
                                     {entry.author && ` przez ${entry.author}`}

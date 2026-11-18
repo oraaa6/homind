@@ -1,20 +1,18 @@
-import { PlusOutlined } from '@ant-design/icons';
-import { Head, Link } from '@inertiajs/react';
-import { Alert, Tag } from 'antd';
 import Button from '@/components/Button';
 import Filters from '@/components/filters';
 import Heading from '@/components/heading';
 import ItemsTable from '@/components/items-table';
 import Statistics from '@/components/statistics';
-import useListControls, {
-    SortValue,
-} from '@/hooks/use-list-controls';
 import type { SortOption } from '@/hooks/use-list-controls';
+import useListControls, { SortValue } from '@/hooks/use-list-controls';
 import { maintenance, things } from '@/routes';
 import {
     add as addMaintenance,
     show as showMaintenance,
 } from '@/routes/maintenance';
+import { PlusOutlined } from '@ant-design/icons';
+import { Head, Link } from '@inertiajs/react';
+import { Alert, Tag } from 'antd';
 import type { MaintenanceIndexDevice, MaintenanceService } from './types';
 import {
     formatMaintenanceDate,
@@ -59,6 +57,7 @@ export default function Maintenance({
     const categoryCounts = devices.reduce<Record<string, number>>(
         (counts, device) => {
             counts[device.category] = (counts[device.category] ?? 0) + 1;
+
             return counts;
         },
         {},
@@ -125,7 +124,7 @@ export default function Maintenance({
             <div className="flex flex-nowrap items-center justify-end gap-2">
                 <Button
                     href={showMaintenance(device.id).url}
-                    type="ghost"
+                    type="secondary"
                     size="small"
                 >
                     Szczegóły

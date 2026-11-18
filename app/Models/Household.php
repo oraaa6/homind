@@ -18,6 +18,7 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $updated_at
  * @property-read Collection<int, User> $users
  * @property-read Collection<int, Place> $places
+ * @property-read Collection<int, Routine> $routines
  */
 #[Fillable(['name'])]
 class Household extends Model
@@ -39,5 +40,11 @@ class Household extends Model
     public function places(): HasMany
     {
         return $this->hasMany(Place::class);
+    }
+
+    /** @return HasMany<Routine, $this> */
+    public function routines(): HasMany
+    {
+        return $this->hasMany(Routine::class);
     }
 }
